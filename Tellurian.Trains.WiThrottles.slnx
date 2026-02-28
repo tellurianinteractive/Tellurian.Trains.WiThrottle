@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Implementation plan.md" />
+    <File Path="README.md" />
+    <File Path="Requirements specification.md" />
+  </Folder>
+  <Project Path="Tellurian.Trains.WiThrottles.Tests\Tellurian.Trains.WiThrottles.Tests.csproj" />
+  <Project Path="Tellurian.Trains.WiThrottles\Tellurian.Trains.WiThrottles.csproj" />
+</Solution>
