@@ -50,7 +50,7 @@ Tellurian.Trains.WiThrottles/
 - Configuration records (sealed records with defaults):
   - `WiThrottleSettings`: Port (12090), HeartbeatTimeoutSeconds (10), ServiceName
   - `ThrottlingSettings`: SpeedTimeThresholdMs (150), SpeedStepThreshold (2), GlobalMessageRatePerSecond (20)
-  - `CommandStationSettings`: Type (LocoNet/Z21), serial port settings, Z21 address/ports
+  - `CommandStationSettings`: Type (Serial/Z21), serial port settings, Z21 address/ports
 
 ### Phase 2: Protocol Layer
 

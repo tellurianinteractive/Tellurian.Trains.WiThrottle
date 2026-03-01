@@ -29,7 +29,7 @@ else
     if (string.IsNullOrWhiteSpace(csType))
     {
         throw new InvalidOperationException(
-            "CommandStation:Type is not configured. Set it to \"LocoNet\" or \"Z21\" in appsettings.json.");
+            "CommandStation:Type is not configured. Set it to \"Serial\" or \"Z21\" in appsettings.json.");
     }
 
     if (csType.Equals("Z21", StringComparison.OrdinalIgnoreCase))
@@ -46,7 +46,7 @@ else
         builder.Services.AddSingleton<Tellurian.Trains.Adapters.Z21.Adapter>();
         builder.Services.AddSingleton<ILoco>(sp => sp.GetRequiredService<Tellurian.Trains.Adapters.Z21.Adapter>());
     }
-    else if (csType.Equals("LocoNet", StringComparison.OrdinalIgnoreCase))
+    else if (csType.Equals("Serial", StringComparison.OrdinalIgnoreCase))
     {
         // LocoNet via serial port — verify the port exists before wiring up
         var portName = csConfig["SerialPort:PortName"] ?? "COM3";
@@ -73,7 +73,7 @@ else
     else
     {
         throw new InvalidOperationException(
-            $"Unknown CommandStation:Type \"{csType}\". Supported values are \"LocoNet\" and \"Z21\".");
+            $"Unknown CommandStation:Type \"{csType}\". Supported values are \"Serial\" and \"Z21\".");
     }
 
     builder.Services.AddHostedService<CommandStationInitializer>();

@@ -14,28 +14,20 @@ to control model trains via LocoNet or Roco Z21 command stations.
 
 ## Prerequisites
 
-- .NET 10 SDK
-- A LocoNet-compatible command station with serial interface, **or** a Roco Z21
+- A LocoNet-compatible command station
+- ROCO Z21 with a router, using UDP communication, **or**
+- An USB-to-LocoNet device using serial communication, like the [RR-Cirkits LocoBuffer-NG](https://digira.se/webshop/ws-/products/locobuffer-ng).
 
 ## Getting Started
 
-### Development Mode (no hardware)
-
-In development mode the server uses a logging mock instead of a real command station.
-All loco commands are logged to the console.
-
-```
-dotnet run --project Tellurian.Trains.WiThrottles --environment Development
-```
-
-### Production Mode with LocoNet
+### Running with Serial Communication
 
 Edit `appsettings.json` to set your serial port, then run:
 
 ```json
 {
   "CommandStation": {
-    "Type": "LocoNet",
+    "Type": "Serial",
     "SerialPort": {
       "PortName": "COM3",
       "BaudRate": 57600
@@ -44,11 +36,7 @@ Edit `appsettings.json` to set your serial port, then run:
 }
 ```
 
-```
-dotnet run --project Tellurian.Trains.WiThrottles
-```
-
-### Production Mode with Z21
+### Running with ROCO Z21
 
 Set the command station type to `Z21` and configure the Z21 network address:
 
@@ -65,9 +53,6 @@ Set the command station type to `Z21` and configure the Z21 network address:
 }
 ```
 
-```
-dotnet run --project Tellurian.Trains.WiThrottles
-```
 
 ## Configuration
 
@@ -81,7 +66,7 @@ All settings are in `appsettings.json`:
 | `Throttling` | `SpeedTimeThresholdMs` | `150` | Min ms between forwarded speed commands per loco |
 | `Throttling` | `SpeedStepThreshold` | `2` | Min speed step change to bypass time threshold |
 | `Throttling` | `GlobalMessageRatePerSecond` | `20` | Max command station messages/sec across all clients |
-| `CommandStation` | `Type` | `LocoNet` | `LocoNet` or `Z21` |
+| `CommandStation` | `Type` | — | `Serial` or `Z21` (required) |
 | `CommandStation:SerialPort` | `PortName` | `COM3` | Serial port for LocoNet |
 | `CommandStation:SerialPort` | `BaudRate` | `57600` | Baud rate for LocoNet |
 | `CommandStation:Z21` | `Address` | `192.168.0.111` | Z21 IP address |
@@ -90,56 +75,6 @@ All settings are in `appsettings.json`:
 
 Settings can also be overridden via environment variables or command-line arguments
 using standard .NET configuration (e.g. `WiThrottle__Port=12345`).
-
-## Project Structure
-
-```
-Tellurian.Trains.WiThrottles/
-  Program.cs                              -- Host setup and DI configuration
-  Configuration/
-    WiThrottleSettings.cs                 -- Server settings (port, heartbeat, service name)
-    ThrottlingSettings.cs                 -- Speed debounce and rate limit settings
-    CommandStationSettings.cs             -- LocoNet / Z21 connection settings
-  Protocol/
-    WiThrottleMessage.cs                  -- Discriminated union of all protocol messages
-    WiThrottleParser.cs                   -- Line parser -> WiThrottleMessage
-    LocoAddress.cs                        -- L1234/S5 <-> Address conversion
-  Sessions/
-    ThrottleSession.cs                    -- Per-client session state (up to 4 locos)
-    SessionHandler.cs                     -- Message handler -> ILoco calls + responses
-    LocoState.cs                          -- Per-loco mutable state (speed, direction, functions)
-  Throttling/
-    ThrottledLocoController.cs            -- ILoco wrapper with speed debounce + rate limit
-    SpeedThrottler.cs                     -- Per-loco speed debouncing with trailing edge
-    GlobalRateLimiter.cs                  -- Token bucket rate limiter
-  Server/
-    WiThrottleTcpServer.cs               -- TCP listener, client sessions, heartbeat monitor
-    MdnsAdvertiser.cs                     -- mDNS service advertisement
-    CommandStationInitializer.cs          -- Starts the command station adapter
-  Development/
-    LoggingLocoController.cs              -- Mock ILoco for development mode
-
-Tellurian.Trains.WiThrottles.Tests/
-  Protocol/
-    WiThrottleParserTests.cs              -- Parser tests for all message types
-    LocoAddressTests.cs                   -- Address conversion and round-trip tests
-  Sessions/
-    ThrottleSessionTests.cs               -- Session state management tests
-    SessionHandlerTests.cs                -- Message handling -> ILoco call verification
-  Throttling/
-    SpeedThrottlerTests.cs                -- Debounce threshold and trailing edge tests
-    GlobalRateLimiterTests.cs             -- Token bucket behavior tests
-  Integration/
-    SimulatedWiFredTests.cs               -- End-to-end TCP tests simulating WiFred
-  Helpers/
-    RecordingLocoController.cs            -- ILoco test double that records all calls
-```
-
-## Running Tests
-
-```
-dotnet run --project Tellurian.Trains.WiThrottles.Tests
-```
 
 ## Known Limitations
 
