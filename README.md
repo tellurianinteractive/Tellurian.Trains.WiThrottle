@@ -3,6 +3,9 @@
 A .NET 10 WiThrottle protocol server that enables [WiFred](https://github.com/newHeiko/wiFred) throttles
 to control model trains via LocoNet or Roco Z21 command stations.
 
+**Important: This implementation *only* supports the part of the wiThrottle
+protocol acually used by the **wiFRED**.**
+
 ## Features
 
 - WiThrottle protocol v2.0 (WiFred-compatible subset)
