@@ -122,6 +122,14 @@ All settings are in `appsettings.json`:
 Settings can also be overridden via environment variables or command-line arguments
 using standard .NET configuration (e.g. `WiThrottle__Port=12345`).
 
+## Supported Platforms
+
+Published as self-contained single-file executables for:
+
+- **Windows x64** (`win-x64`)
+- **Linux ARM** (`linux-arm`) — e.g. Raspberry Pi (32-bit)
+- **Linux ARM64** (`linux-arm64`) — e.g. Raspberry Pi (64-bit)
+
 ## Known Limitations
 
 - LocoNet adapter (Serial, TCP, and UDP) supports functions F0-F12 only; F13-F28 require Z21.
