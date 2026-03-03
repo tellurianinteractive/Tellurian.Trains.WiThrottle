@@ -29,7 +29,7 @@ else
     if (string.IsNullOrWhiteSpace(csType))
     {
         throw new InvalidOperationException(
-            "CommandStation:Type is not configured. Set it to \"Serial\" or \"Z21\" in appsettings.json.");
+            "CommandStation:Type is not configured. Set it to \"Serial\", \"Z21\", \"LocoNetTcp\", or \"LocoNetUdp\" in appsettings.json.");
     }
 
     if (csType.Equals("Z21", StringComparison.OrdinalIgnoreCase))
@@ -70,10 +70,44 @@ else
         builder.Services.AddSingleton<Adapter>();
         builder.Services.AddSingleton<ILoco>(sp => sp.GetRequiredService<Adapter>());
     }
+    else if (csType.Equals("LocoNetTcp", StringComparison.OrdinalIgnoreCase))
+    {
+        // LocoNet via TCP (LoconetOverTcp protocol)
+        builder.Services.AddSingleton<ITcpStreamAdapter>(sp =>
+        {
+            var settings = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CommandStationSettings>>().Value;
+            return new TcpStreamAdapter(settings.LocoNetTcp.Hostname, settings.LocoNetTcp.Port);
+        });
+        builder.Services.AddSingleton<ICommunicationsChannel, TcpLocoNetChannel>();
+
+        builder.Services.AddSingleton<Adapter>();
+        builder.Services.AddSingleton<ILoco>(sp => sp.GetRequiredService<Adapter>());
+    }
+    else if (csType.Equals("LocoNetUdp", StringComparison.OrdinalIgnoreCase))
+    {
+        // LocoNet via UDP multicast
+        builder.Services.AddSingleton<IUdpLocoNetAdapter>(sp =>
+        {
+            var settings = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CommandStationSettings>>().Value;
+            var multicastGroup = IPAddress.Parse(settings.LocoNetUdp.MulticastGroup);
+            var sendEndpoint = new IPEndPoint(IPAddress.Parse(settings.LocoNetUdp.SendAddress), settings.LocoNetUdp.SendPort);
+            return new UdpLocoNetAdapter(multicastGroup, settings.LocoNetUdp.ListenPort, sendEndpoint);
+        });
+        builder.Services.AddSingleton<ICommunicationsChannel>(sp =>
+        {
+            var settings = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CommandStationSettings>>().Value;
+            var adapter = sp.GetRequiredService<IUdpLocoNetAdapter>();
+            var logger = sp.GetRequiredService<ILogger<UdpLocoNetChannel>>();
+            return new UdpLocoNetChannel(adapter, logger, settings.LocoNetUdp.ValidateChecksum);
+        });
+
+        builder.Services.AddSingleton<Adapter>();
+        builder.Services.AddSingleton<ILoco>(sp => sp.GetRequiredService<Adapter>());
+    }
     else
     {
         throw new InvalidOperationException(
-            $"Unknown CommandStation:Type \"{csType}\". Supported values are \"Serial\" and \"Z21\".");
+            $"Unknown CommandStation:Type \"{csType}\". Supported values are \"Serial\", \"Z21\", \"LocoNetTcp\", and \"LocoNetUdp\".");
     }
 
     builder.Services.AddHostedService<CommandStationInitializer>();
