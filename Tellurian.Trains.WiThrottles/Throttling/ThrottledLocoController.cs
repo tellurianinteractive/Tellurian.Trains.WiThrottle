@@ -15,6 +15,7 @@ public sealed class ThrottledLocoController : IDisposable
     private readonly GlobalRateLimiter _rateLimiter;
     private readonly ThrottlingSettings _settings;
     private readonly ConcurrentDictionary<int, SpeedThrottler> _speedThrottlers = new();
+    private readonly ConcurrentDictionary<int, Direction> _currentDirections = new();
     private readonly ILogger<ThrottledLocoController> _logger;
 
     public ThrottledLocoController(
@@ -36,12 +37,14 @@ public sealed class ThrottledLocoController : IDisposable
 
     public async Task<bool> DriveWithSpeedThrottlingAsync(Address address, byte speed, Direction direction, CancellationToken cancellationToken = default)
     {
+        _currentDirections[address.Number] = direction;
         var throttler = _speedThrottlers.GetOrAdd(address.Number, _ =>
             new SpeedThrottler(_settings.SpeedTimeThresholdMs, _settings.SpeedStepThreshold, async s =>
             {
+                var currentDirection = _currentDirections.GetValueOrDefault(address.Number, Direction.Forward);
                 var drive = new Drive
                 {
-                    Direction = direction,
+                    Direction = currentDirection,
                     Speed = Speed.Set126(s)
                 };
                 await _rateLimiter.WaitForTokenAsync(cancellationToken);
@@ -68,6 +71,7 @@ public sealed class ThrottledLocoController : IDisposable
     {
         if (_speedThrottlers.TryRemove(addressNumber, out var throttler))
             throttler.Dispose();
+        _currentDirections.TryRemove(addressNumber, out _);
     }
 
     public void Dispose()

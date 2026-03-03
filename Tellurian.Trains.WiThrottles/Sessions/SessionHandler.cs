@@ -163,9 +163,27 @@ public sealed class SessionHandler
         {
             if (message.FunctionNumber is >= 0 and <= 28)
             {
-                loco.FunctionStates[message.FunctionNumber] = message.On;
+                bool newState;
+                if (message.IsForce)
+                {
+                    // Force (f command): directly set the function state
+                    newState = message.On;
+                }
+                else if (loco.FunctionMomentary[message.FunctionNumber])
+                {
+                    // Momentary function: pass button state directly
+                    newState = message.On;
+                }
+                else
+                {
+                    // Latching function: toggle on button press, ignore release
+                    if (!message.On) continue;
+                    newState = !loco.FunctionStates[message.FunctionNumber];
+                }
+
+                loco.FunctionStates[message.FunctionNumber] = newState;
                 var funcEnum = (Functions)message.FunctionNumber;
-                var function = Function.Set(funcEnum, message.On);
+                var function = Function.Set(funcEnum, newState);
                 await _controller.SetFunctionAsync(loco.Address, function, cancellationToken);
             }
         }

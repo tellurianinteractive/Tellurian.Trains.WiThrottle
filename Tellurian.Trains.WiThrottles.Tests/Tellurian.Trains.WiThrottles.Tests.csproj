@@ -8,6 +8,7 @@
     <RootNamespace>Tellurian.Trains.WiThrottles.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

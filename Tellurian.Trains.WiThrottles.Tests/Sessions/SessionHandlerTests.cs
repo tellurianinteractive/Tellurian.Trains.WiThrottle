@@ -116,12 +116,12 @@ public class SessionHandlerTests
     }
 
     [TestMethod]
-    public async Task SetFunction_On_CallsSetFunction()
+    public async Task SetFunction_LatchingPress_TogglesOn()
     {
         var (handler, recorder) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
 
-        await handler.HandleAsync(new WiThrottleMessage.SetFunction("L1234", 0, true));
+        await handler.HandleAsync(new WiThrottleMessage.SetFunction("L1234", 0, true, false));
 
         Assert.AreEqual(1, recorder.SetFunctionCalls.Count());
         var call = recorder.SetFunctionCalls.First();
@@ -130,12 +130,39 @@ public class SessionHandlerTests
     }
 
     [TestMethod]
-    public async Task SetFunction_Off_CallsSetFunction()
+    public async Task SetFunction_LatchingRelease_IsIgnored()
     {
         var (handler, recorder) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
 
-        await handler.HandleAsync(new WiThrottleMessage.SetFunction("L1234", 3, false));
+        await handler.HandleAsync(new WiThrottleMessage.SetFunction("L1234", 0, false, false));
+
+        Assert.AreEqual(0, recorder.SetFunctionCalls.Count());
+    }
+
+    [TestMethod]
+    public async Task SetFunction_LatchingPressAgain_TogglesOff()
+    {
+        var (handler, recorder) = CreateHandler();
+        await AcquireLocoAsync(handler, "L1234");
+
+        // First press: toggle off -> on
+        await handler.HandleAsync(new WiThrottleMessage.SetFunction("L1234", 0, true, false));
+        // Second press: toggle on -> off
+        await handler.HandleAsync(new WiThrottleMessage.SetFunction("L1234", 0, true, false));
+
+        Assert.AreEqual(2, recorder.SetFunctionCalls.Count());
+        Assert.IsTrue(recorder.SetFunctionCalls.First().Function!.Value.IsOn);
+        Assert.IsFalse(recorder.SetFunctionCalls.Last().Function!.Value.IsOn);
+    }
+
+    [TestMethod]
+    public async Task SetFunction_Force_DirectlySetsState()
+    {
+        var (handler, recorder) = CreateHandler();
+        await AcquireLocoAsync(handler, "L1234");
+
+        await handler.HandleAsync(new WiThrottleMessage.SetFunction("L1234", 3, false, true));
 
         Assert.AreEqual(1, recorder.SetFunctionCalls.Count());
         var call = recorder.SetFunctionCalls.First();

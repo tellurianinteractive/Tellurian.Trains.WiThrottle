@@ -118,7 +118,7 @@ public static class WiThrottleParser
         if (command.Length < 3) return new WiThrottleMessage.Unknown($"MTA{target}<;>{command}");
         var on = command[1] == '1';
         if (int.TryParse(command.AsSpan(2), out var funcNum))
-            return new WiThrottleMessage.SetFunction(target, funcNum, on);
+            return new WiThrottleMessage.SetFunction(target, funcNum, on, isForce);
         return new WiThrottleMessage.Unknown($"MTA{target}<;>{command}");
     }
 

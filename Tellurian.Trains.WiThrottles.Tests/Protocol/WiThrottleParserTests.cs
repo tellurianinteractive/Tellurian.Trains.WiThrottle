@@ -116,6 +116,7 @@ public class WiThrottleParserTests
         Assert.AreEqual("L1234", msg.Target);
         Assert.AreEqual(0, msg.FunctionNumber);
         Assert.IsTrue(msg.On);
+        Assert.IsFalse(msg.IsForce);
     }
 
     [TestMethod]
@@ -127,6 +128,7 @@ public class WiThrottleParserTests
         var msg = (WiThrottleMessage.SetFunction)result;
         Assert.AreEqual(5, msg.FunctionNumber);
         Assert.IsFalse(msg.On);
+        Assert.IsFalse(msg.IsForce);
     }
 
     [TestMethod]
@@ -138,6 +140,7 @@ public class WiThrottleParserTests
         var msg = (WiThrottleMessage.SetFunction)result;
         Assert.AreEqual(28, msg.FunctionNumber);
         Assert.IsTrue(msg.On);
+        Assert.IsTrue(msg.IsForce);
     }
 
     [TestMethod]

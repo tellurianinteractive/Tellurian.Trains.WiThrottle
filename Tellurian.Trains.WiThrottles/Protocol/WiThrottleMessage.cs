@@ -38,7 +38,7 @@ public abstract record WiThrottleMessage
     public sealed record EmergencyStop(string Target) : WiThrottleMessage;
 
     /// <summary>Client sets function state (toggle F or force f). Format: MTA{target}&lt;;&gt;F{0or1}{num} or f{0or1}{num}</summary>
-    public sealed record SetFunction(string Target, int FunctionNumber, bool On) : WiThrottleMessage;
+    public sealed record SetFunction(string Target, int FunctionNumber, bool On, bool IsForce) : WiThrottleMessage;
 
     /// <summary>Client sets function momentary/locking mode. Format: MTA{target}&lt;;&gt;m{0or1}{num}</summary>
     public sealed record SetFunctionMode(string Target, int FunctionNumber, bool Momentary) : WiThrottleMessage;
