@@ -1,7 +1,7 @@
 # WiThrottle Server for WiFred
 
 A .NET 10 WiThrottle protocol server that enables [WiFred](https://github.com/newHeiko/wiFred) throttles
-to control model trains via LocoNet or Roco Z21 command stations.
+to control model trains via any command station that has LocoNet support or a network API (e.g. Roco Z21).
 
 **Important: This implementation *only* supports the part of the wiThrottle
 protocol acually used by the **wiFRED**.**
@@ -13,15 +13,21 @@ protocol acually used by the **wiFRED**.**
 - mDNS service discovery (`_withrottle._tcp`)
 - Heartbeat monitoring with automatic emergency stop
 - Per-loco speed debouncing and global rate limiting
+- Momentary (e.g. horn) and latching (e.g. lights) function buttons, as configured in the wiFRED
 - LocoNet (serial, TCP, UDP multicast) and Z21 (UDP) command station adapters
 
 ## Prerequisites
 
-- A LocoNet-compatible command station
-- ROCO Z21 with a router, using UDP communication, **or**
-- An USB-to-LocoNet device using serial communication, like the [RR-Cirkits LocoBuffer-NG](https://digira.se/webshop/ws-/products/locobuffer-ng), **or**
-- A LoconetOverTcp server (e.g. JMRI, Rocrail, or LbServer) for TCP access, **or**
-- A LocoNet UDP multicast gateway (e.g. loconetd or GCA101 LocoBuffer-UDP).
+Any command station that has LocoNet support or a network API (like the Z21 UDP protocol) can be used.
+Only the USB-to-LocoNet serial option connects directly to the LocoNet bus;
+all other adapters communicate with the command station via its own protocol or API.
+
+Pick **one** of the following:
+
+- **ROCO Z21** (or compatible) — communicates via the Z21 UDP API, no LocoNet bus connection needed.
+- **Command station with LocoNet** — via a LoconetOverTcp server (e.g. JMRI, Rocrail, or LbServer) for TCP access.
+- **Command station with LocoNet** — via a UDP multicast gateway (e.g. loconetd or GCA101 LocoBuffer-UDP).
+- **USB-to-LocoNet device** — connects directly to the LocoNet bus via serial communication, e.g. the [RR-Cirkits LocoBuffer-NG](https://digira.se/webshop/ws-/products/locobuffer-ng).
 
 ## Getting Started
 
@@ -92,6 +98,27 @@ Connect via a UDP multicast gateway (e.g. loconetd or GCA101 LocoBuffer-UDP):
   }
 }
 ```
+
+### Running on a FREMO PiLocoBuffer
+
+The [PiLocoBuffer](https://wiki.fremo-net.eu/doku.php?id=loconet:lbserver:pilocobuffer_active) is a Raspberry Pi with a LocoNet hat board and a built-in LbServer.
+Since LbServer provides LocoNet over TCP, this app can run on the same Raspberry Pi
+and connect locally:
+
+```json
+{
+  "CommandStation": {
+    "Type": "LocoNetTcp",
+    "LocoNetTcp": {
+      "Hostname": "127.0.0.1",
+      "Port": 1234
+    }
+  }
+}
+```
+
+Publish the app for your Raspberry Pi OS (`linux-arm` for 32-bit, `linux-arm64` for 64-bit),
+copy it to the PiLocoBuffer, and run it alongside the LbServer.
 
 ## Configuration
 

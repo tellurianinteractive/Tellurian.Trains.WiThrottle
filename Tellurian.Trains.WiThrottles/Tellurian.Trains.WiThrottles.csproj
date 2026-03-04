@@ -17,4 +17,20 @@
 		<PackageReference Include="Tellurian.Trains.Adapters.Z21" Version="1.6.1" />
 	</ItemGroup>
 
+	<Target Name="PublishAllPlatforms" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' and '$(RuntimeIdentifier)' == ''">
+		<Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -p:PublishProfile=win-x64" />
+		<Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -p:PublishProfile=linux-arm" />
+		<Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -p:PublishProfile=linux-arm64" />
+	</Target>
+
+	<Target Name="ZipAfterPublish" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release' and '$(RuntimeIdentifier)' != ''">
+		<PropertyGroup>
+			<DeployDir>C:\Users\Stefan\OneDrive\Public\Deploy\wiFREDserver</DeployDir>
+			<ZipFilePath>$(DeployDir)\$(RuntimeIdentifier).zip</ZipFilePath>
+		</PropertyGroup>
+		<Delete Files="$(ZipFilePath)" Condition="Exists('$(ZipFilePath)')" />
+		<ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(ZipFilePath)" Overwrite="true" />
+		<RemoveDir Directories="$(PublishDir)" />
+	</Target>
+
 </Project>
