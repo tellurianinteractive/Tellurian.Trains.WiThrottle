@@ -6,6 +6,11 @@ to control model trains via any command station that has LocoNet support or a ne
 **Important: This implementation *only* supports the part of the wiThrottle
 protocol acually used by the **wiFRED**.**
 
+## References
+- [wiFred source code](https://github.com/newHeiko/wiFred),
+- [JMRI wiThrottle protocol](https://www.jmri.org/help/en/package/jmri/jmrit/withrottle/Protocol.shtml),
+- [wiFRED user manual](https://newheiko.github.io/wiFred/documentation/docu_en.html)
+
 ## Features
 
 - WiThrottle protocol v2.0 (WiFred-compatible subset)
