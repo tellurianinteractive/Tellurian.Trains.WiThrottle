@@ -87,7 +87,10 @@ and `F0<n>` (release) events. Force on/off uses `f1<n>` and `f0<n>`.
 
 The wiFRED runs a web server on **port 80**. All configuration changes are made via
 HTTP GET requests with query parameters (the HTML forms use `method="get"`).
-No authentication is required.
+No authentication is required. Anyone on the same network who knows the device's
+IP address can access and modify the configuration at any time. The IP address is
+discoverable via the UDP broadcast the wiFRED sends on port 51289 after connecting
+to WiFi (see [Device Discovery](#device-discovery)).
 
 ### Accessing the Web Server
 
