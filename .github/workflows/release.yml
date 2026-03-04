@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Run tests
+        run: dotnet test --configuration Release --no-restore
+
+      - name: Publish all platforms
+        run: |
+          project="Tellurian.Trains.WiThrottles/Tellurian.Trains.WiThrottles.csproj"
+          common_args="--configuration Release --self-contained true -p:PublishSingleFile=true"
+          dotnet publish "$project" $common_args -r win-x64 -o publish/win-x64
+          dotnet publish "$project" $common_args -r linux-arm -o publish/linux-arm
+          dotnet publish "$project" $common_args -r linux-arm64 -o publish/linux-arm64
+
+      - name: Bundle documentation and create zips
+        run: |
+          for rid in win-x64 linux-arm linux-arm64; do
+            cp wiFRED.md wiFRED.sv.md "publish/${rid}/"
+            cd "publish/${rid}" && zip -r "../${rid}.zip" . && cd ../..
+          done
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            publish/win-x64.zip \
+            publish/linux-arm.zip \
+            publish/linux-arm64.zip \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes
