@@ -1,6 +1,10 @@
 # wiFRED Documentation
 
-Reference documentation for the [wiFRED](https://github.com/newHeiko/wiFred) wireless throttle.
+This document covers internal technical details abouit the **wiFRED**
+relevant to WiThrottle server implementers
+and is based in the [wiFRED implementation](https://github.com/newHeiko/wiFred) on GitHub.
+For end-user documentation (quickstart, basic operation, hardware assembly), 
+see the [official wiFRED documentation](https://newheiko.github.io/wiFred/documentation/docu_en.html). 
 
 ## Loco Switches and Power Management
 
