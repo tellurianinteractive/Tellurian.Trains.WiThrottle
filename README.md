@@ -120,6 +120,31 @@ and connect locally:
 Publish the app for your Raspberry Pi OS (`linux-arm` for 32-bit, `linux-arm64` for 64-bit),
 copy it to the PiLocoBuffer, and run it alongside the LbServer.
 
+## Installing and Running
+
+### Linux
+
+Install and run for the first time
+1. unzip **linux-arm64.zip** -d wifredserver **<- or the zip for the platform you run on**
+1. cd wifredserver
+2. configure control station to use in **appsettings.json**
+1. chmod +x Tellurian.Trains.WiThrottles
+1. ./Tellurian.Trains.WiThrottles  **<- this starts the app, only thing needed when running later**
+
+You may also consider to use autostart of the wiFRED Server.
+This is operating system specific and not covered here.
+
+### Windows
+
+Install and run for the first time
+1. unzip **linux-arm64.zip** -d wifredserver **<- or the zip for the platform you run on**
+1. cd wifredserver
+2. configure control station to use in **appsettings.json**
+1. ./Tellurian.Trains.WiThrottles  **<- this starts the app, only thing needed when running later**
+
+You may also consider to use autostart of the wiFRED Server.
+This is operating system specific and not covered here.
+
 ## Configuration
 
 All settings are in `appsettings.json`:
