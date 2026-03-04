@@ -15,7 +15,7 @@ hårdvarulåskrets som strömsätter ESP32-S2. Firmwaren kallstartar från börj
 gång — det finns ingen mjukvarukonfigurerad GPIO-uppväckning från dvala.
 
 Vid uppstart gör wiFRED:
-1. Initierar GPIO, avvisartimrar och ADC
+1. Initierar GPIO, timers för kontaktstuds och omvandlare för analog-till-digital
 2. Ansluter till ett konfigurerat WiFi-nätverk
 3. Upptäcker eller ansluter till den konfigurerade WiThrottle-servern
 4. Förvärvar varje lok vars omkopplare är i ON-läge
