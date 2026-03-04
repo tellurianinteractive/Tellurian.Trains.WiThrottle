@@ -23,7 +23,7 @@ jobs:
         run: dotnet restore
 
       - name: Run tests
-        run: dotnet test --configuration Release --no-restore
+        run: dotnet test --configuration Release --no-restore -p:TestingPlatformDotnetTestSupport=true
 
       - name: Publish all platforms
         run: |
