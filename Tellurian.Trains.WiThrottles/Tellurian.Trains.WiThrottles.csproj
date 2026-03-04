@@ -17,7 +17,7 @@
 		<PackageReference Include="Tellurian.Trains.Adapters.Z21" Version="1.6.1" />
 	</ItemGroup>
 
-	<Target Name="PublishAllPlatforms" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' and '$(RuntimeIdentifier)' == ''">
+	<Target Name="PublishAllPlatforms" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' and '$(RuntimeIdentifier)' == '' and '$(CI)' != 'true'">
 		<Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -p:PublishProfile=win-x64" />
 		<Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -p:PublishProfile=linux-arm" />
 		<Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -p:PublishProfile=linux-arm64" />
