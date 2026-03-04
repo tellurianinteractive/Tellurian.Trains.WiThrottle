@@ -1,7 +1,6 @@
 # wiFRED Documentation
 
-Reference documentation for the [wiFRED](https://github.com/newHeiko/wiFred) wireless throttle,
-as relevant to this WiThrottle server project.
+Reference documentation for the [wiFRED](https://github.com/newHeiko/wiFred) wireless throttle.
 
 ## Loco Switches and Power Management
 
