@@ -72,6 +72,7 @@ public sealed class WiThrottleTcpServer : BackgroundService
         var sessionLogger = _loggerFactory.CreateLogger($"WiThrottle.Session.{clientId}");
         var handler = new SessionHandler(session, _controller, sessionLogger);
         _activeSessions[clientId] = handler;
+        var clientIp = (client.Client.RemoteEndPoint as IPEndPoint)?.Address;
 
         try
         {
@@ -134,6 +135,17 @@ public sealed class WiThrottleTcpServer : BackgroundService
             }
 
             _activeSessions.TryRemove(clientId, out _);
+
+            if (clientIp is not null)
+            {
+                try { await WiFredDiscoveryService.SendInactiveAsync(clientIp); }
+                catch (Exception ex)
+                {
+                    if (_logger.IsEnabled(LogLevel.Warning))
+                        _logger.LogWarning(ex, "Failed to send wiFRED inactive notification for {ClientId}", clientId);
+                }
+            }
+
             if (_logger.IsEnabled(LogLevel.Information))
                 _logger.LogInformation("Client disconnected: {ClientId} ({Name})", clientId, session.Name);
         }

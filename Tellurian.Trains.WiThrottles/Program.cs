@@ -120,5 +120,10 @@ builder.Services.AddSingleton<ThrottledLocoController>();
 builder.Services.AddHostedService<WiThrottleTcpServer>();
 builder.Services.AddHostedService<MdnsAdvertiser>();
 
+// wiFRED discovery
+builder.Services.Configure<WiFredDiscoverySettings>(builder.Configuration.GetSection("WiFredDiscovery"));
+builder.Services.AddHttpClient();
+builder.Services.AddHostedService<WiFredDiscoveryService>();
+
 var host = builder.Build();
 host.Run();

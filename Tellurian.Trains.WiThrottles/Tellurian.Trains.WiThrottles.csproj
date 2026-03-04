@@ -1,18 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<LangVersion>latest</LangVersion>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<AssemblyName>Tellurian.Trains.WiThrottles</AssemblyName>
 		<RootNamespace>Tellurian.Trains.WiThrottles</RootNamespace>
-		<Version>1.0.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Makaretu.Dns.Multicast" Version="0.27.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
 		<PackageReference Include="Tellurian.Trains.Adapters.LocoNet" Version="1.6.1" />
 		<PackageReference Include="Tellurian.Trains.Adapters.Z21" Version="1.6.1" />
 	</ItemGroup>
