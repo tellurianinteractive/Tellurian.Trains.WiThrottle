@@ -118,6 +118,31 @@ public sealed class WiFredDiscoveryService(
             .ToList();
     }
 
+    public async Task<bool> UpdateLocoAddressAsync(IPAddress deviceAddress, int slot, int newAddress)
+    {
+        if (!_devices.TryGetValue(deviceAddress, out var device))
+            return false;
+
+        try
+        {
+            var client = httpClientFactory.CreateClient();
+            client.Timeout = TimeSpan.FromSeconds(10);
+            await client.GetStringAsync($"http://{deviceAddress}/?loco={slot}&loco.address={newAddress}");
+            await FetchConfigurationAsync(device, CancellationToken.None);
+
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Updated loco {Slot} address to {Address} on wiFRED at {DeviceAddress}",
+                    slot, newAddress, deviceAddress);
+            return true;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(ex, "Failed to update loco address on wiFRED at {Address}", deviceAddress);
+            return false;
+        }
+    }
+
     /// <summary>
     /// Sends a UDP message to mark a wiFRED device as inactive.
     /// Call this from the TCP server when a client disconnects.

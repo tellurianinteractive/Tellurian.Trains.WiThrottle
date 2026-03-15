@@ -112,4 +112,24 @@ internal static partial class Messages
     ///   Looks up a localized string similar to Reload.
     /// </summary>
     internal static string Reload => ResourceManager.GetString("Reload", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Firmware.
+    /// </summary>
+    internal static string Firmware => ResourceManager.GetString("Firmware", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Battery.
+    /// </summary>
+    internal static string Battery => ResourceManager.GetString("Battery", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Save.
+    /// </summary>
+    internal static string Save => ResourceManager.GetString("Save", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Loco {0}.
+    /// </summary>
+    internal static string LocoSlot => ResourceManager.GetString("LocoSlot", Culture)!;
 }

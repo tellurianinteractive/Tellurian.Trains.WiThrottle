@@ -20,17 +20,43 @@ else
             <tr>
                 <th>@Messages.Name</th>
                 <th>@Messages.IPAddress</th>
-                <th>@Messages.LocoAddresses</th>
+                <th>@Messages.Firmware</th>
+                <th>@Messages.Battery</th>
+                @for (var i = 1; i <= WiFredDevice.LocoSlotCount; i++)
+                {
+                    <th>@string.Format(Messages.LocoSlot, i)</th>
+                }
                 <th>@Messages.LastSeen</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var device in _devices)
             {
+                var slots = device.LocoSlots;
                 <tr>
                     <td>@(device.Name ?? Messages.Unnamed)</td>
                     <td>@device.Address</td>
-                    <td>@(device.LocoAddresses.Count > 0 ? string.Join(", ", device.LocoAddresses) : "-")</td>
+                    <td>@(device.FirmwareVersion ?? "-")</td>
+                    <td>@(device.BatteryVoltage ?? "-")</td>
+                    @foreach (var slot in slots)
+                    {
+                        <td class="loco-cell">
+                            @if (IsEditing(device, slot.Slot))
+                            {
+                                <div class="loco-edit">
+                                    <input type="number" min="0" max="9999" @bind="_editAddress" @bind:event="oninput" />
+                                    <button class="save-btn" @onclick="() => SaveLocoAddress(device, slot.Slot)">@Messages.Save</button>
+                                    <button class="cancel-btn" @onclick="CancelEdit">&times;</button>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="loco-value" @onclick="() => StartEdit(device, slot)">
+                                    @(slot.Address > 0 ? slot.Address : "-")
+                                </span>
+                            }
+                        </td>
+                    }
                     <td>@device.LastSeen.LocalDateTime.ToString("HH:mm:ss")</td>
                 </tr>
             }
@@ -104,6 +130,58 @@ else
         color: #666;
         font-size: 0.85rem;
     }
+
+    .loco-value {
+        cursor: pointer;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+
+    .loco-value:hover {
+        background-color: #444;
+    }
+
+    .loco-edit {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .loco-edit input {
+        width: 70px;
+        padding: 2px 6px;
+        background: #333;
+        color: #eee;
+        border: 1px solid #666;
+        border-radius: 4px;
+    }
+
+    .save-btn {
+        padding: 2px 8px;
+        background: #2a7a2a;
+        color: #eee;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+
+    .save-btn:hover {
+        background: #3a9a3a;
+    }
+
+    .cancel-btn {
+        padding: 2px 6px;
+        background: transparent;
+        color: #888;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .cancel-btn:hover {
+        color: #f88;
+    }
 </style>
 
 @code {
@@ -111,6 +189,10 @@ else
     private IReadOnlyList<LocoAddressConflict> _conflicts = [];
     private DateTime _lastUpdated = DateTime.Now;
     private Timer? _refreshTimer;
+
+    private WiFredDevice? _editingDevice;
+    private int _editingSlot;
+    private int _editAddress;
 
     protected override void OnInitialized()
     {
@@ -127,6 +209,29 @@ else
         _devices = DiscoveryService.GetDiscoveredDevices();
         _conflicts = DiscoveryService.GetLocoAddressConflicts();
         _lastUpdated = DateTime.Now;
+    }
+
+    private bool IsEditing(WiFredDevice device, int slot) =>
+        _editingDevice == device && _editingSlot == slot;
+
+    private void StartEdit(WiFredDevice device, LocoSlot slot)
+    {
+        _editingDevice = device;
+        _editingSlot = slot.Slot;
+        _editAddress = slot.Address;
+    }
+
+    private void CancelEdit()
+    {
+        _editingDevice = null;
+        _editingSlot = 0;
+    }
+
+    private async Task SaveLocoAddress(WiFredDevice device, int slot)
+    {
+        await DiscoveryService.UpdateLocoAddressAsync(device.Address, slot, _editAddress);
+        CancelEdit();
+        RefreshData();
     }
 
     public void Dispose()

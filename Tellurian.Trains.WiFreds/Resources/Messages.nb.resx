@@ -99,4 +99,16 @@
   <data name="Reload" xml:space="preserve">
     <value>Last inn på nytt</value>
   </data>
+  <data name="Firmware" xml:space="preserve">
+    <value>Firmware</value>
+  </data>
+  <data name="Battery" xml:space="preserve">
+    <value>Batteri</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Lagre</value>
+  </data>
+  <data name="LocoSlot" xml:space="preserve">
+    <value>Lok {0}</value>
+  </data>
 </root>
