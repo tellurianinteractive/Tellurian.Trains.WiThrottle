@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Tellurian.Trains.WiFreds": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

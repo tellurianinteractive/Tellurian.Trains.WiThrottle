@@ -1,0 +1,136 @@
+@page "/"
+@rendermode InteractiveServer
+@using Tellurian.Trains.WiFreds.Resources
+@using Tellurian.Trains.WiFreds.Server
+@inject WiFredDiscoveryService DiscoveryService
+@implements IDisposable
+
+<PageTitle>@Messages.ConnectedWiFREDs</PageTitle>
+
+<h2>@Messages.ConnectedWiFREDs</h2>
+
+@if (_devices.Count == 0)
+{
+    <p class="no-devices">@Messages.NoDevicesConnected</p>
+}
+else
+{
+    <table class="device-table">
+        <thead>
+            <tr>
+                <th>@Messages.Name</th>
+                <th>@Messages.IPAddress</th>
+                <th>@Messages.LocoAddresses</th>
+                <th>@Messages.LastSeen</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var device in _devices)
+            {
+                <tr>
+                    <td>@(device.Name ?? Messages.Unnamed)</td>
+                    <td>@device.Address</td>
+                    <td>@(device.LocoAddresses.Count > 0 ? string.Join(", ", device.LocoAddresses) : "-")</td>
+                    <td>@device.LastSeen.LocalDateTime.ToString("HH:mm:ss")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<p class="last-updated">@Messages.LastUpdated: @_lastUpdated.ToString("HH:mm:ss")</p>
+
+@if (_conflicts.Count > 0)
+{
+    <h3>@Messages.LocoAddressConflicts</h3>
+    <table class="conflict-table">
+        <thead>
+            <tr>
+                <th>@Messages.LocoAddress</th>
+                <th>@Messages.ConflictingDevices</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var conflict in _conflicts)
+            {
+                <tr>
+                    <td>@conflict.Address</td>
+                    <td>@string.Join(", ", conflict.Devices.Select(d => d.Name ?? d.Address.ToString()))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<style>
+    h2, h3 {
+        color: #eee;
+        margin-bottom: 12px;
+    }
+
+    .no-devices {
+        color: #888;
+        font-style: italic;
+    }
+
+    .device-table, .conflict-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 24px;
+    }
+
+    .device-table th, .device-table td,
+    .conflict-table th, .conflict-table td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid #333;
+    }
+
+    .device-table th, .conflict-table th {
+        color: #aaa;
+        font-weight: 600;
+        border-bottom: 2px solid #555;
+    }
+
+    .device-table td, .conflict-table td {
+        color: #ddd;
+    }
+
+    .conflict-table td {
+        color: #f88;
+    }
+
+    .last-updated {
+        color: #666;
+        font-size: 0.85rem;
+    }
+</style>
+
+@code {
+    private IReadOnlyList<WiFredDevice> _devices = [];
+    private IReadOnlyList<LocoAddressConflict> _conflicts = [];
+    private DateTime _lastUpdated = DateTime.Now;
+    private Timer? _refreshTimer;
+
+    protected override void OnInitialized()
+    {
+        RefreshData();
+        _refreshTimer = new Timer(_ => InvokeAsync(() =>
+        {
+            RefreshData();
+            StateHasChanged();
+        }), null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+    }
+
+    private void RefreshData()
+    {
+        _devices = DiscoveryService.GetDiscoveredDevices();
+        _conflicts = DiscoveryService.GetLocoAddressConflicts();
+        _lastUpdated = DateTime.Now;
+    }
+
+    public void Dispose()
+    {
+        _refreshTimer?.Dispose();
+    }
+}

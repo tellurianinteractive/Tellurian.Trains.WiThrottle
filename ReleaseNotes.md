@@ -1,5 +1,15 @@
 # Release Notes
 
+## Version 1.2.0
+
+### Web Dashboard
+- Built-in Blazor Server web dashboard showing all connected wiFRED devices.
+- Displays device name, IP address, configured loco addresses, and last seen timestamp.
+- Highlights loco address conflicts when multiple wiFREDs control the same loco.
+- Auto-refreshes every 5 seconds.
+- Localized UI with support for English, Swedish, Norwegian, Danish, and German (detected from browser language).
+- Optional auto-open browser on startup via `WiFred:OpenBrowserOnStart` setting.
+
 ## Version 1.1.0
 
 ### wiFRED Device Discovery

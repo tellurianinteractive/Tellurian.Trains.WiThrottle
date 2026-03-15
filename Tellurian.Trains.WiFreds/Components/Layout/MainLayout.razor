@@ -1,0 +1,17 @@
+@inherits LayoutComponentBase
+@using Tellurian.Trains.WiFreds.Resources
+
+<div class="page">
+    <header>
+        <h1>@Messages.AppTitle</h1>
+    </header>
+    <main>
+        @Body
+    </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    @Messages.UnhandledError
+    <a href="." class="reload">@Messages.Reload</a>
+    <span class="dismiss">&#x1F5D9;</span>
+</div>

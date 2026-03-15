@@ -20,6 +20,7 @@ protocol acually used by the **wiFRED**.**
 - Per-loco speed debouncing and global rate limiting
 - Momentary (e.g. horn) and latching (e.g. lights) function buttons, as configured in the wiFRED
 - LocoNet (serial, TCP, UDP multicast) and Z21 (UDP) command station adapters
+- Web dashboard showing all connected wiFREDs with auto-refresh, including loco address conflict detection
 
 ## Prerequisites
 
@@ -122,7 +123,7 @@ and connect locally:
 }
 ```
 
-Publish the app for your Raspberry Pi OS (`linux-arm` for 32-bit, `linux-arm64` for 64-bit),
+Install the app for your Raspberry Pi OS (`linux-arm` for 32-bit, `linux-arm64` for 64-bit),
 copy it to the PiLocoBuffer, and run it alongside the LbServer.
 
 ## Installing and Running
@@ -150,6 +151,23 @@ Install and run for the first time
 You may also consider to use autostart of the wiFRED Server.
 This is operating system specific and not covered here.
 
+## Web Dashboard
+
+The server includes a built-in web dashboard that shows all currently connected wiFRED devices.
+The page auto-refreshes every 5 seconds and displays:
+
+- Device name, IP address, and configured loco addresses
+- Last seen timestamp
+- Loco address conflicts (when multiple wiFREDs control the same loco)
+
+The web UI is available at `http://<server-address>:5000` by default.
+The web port can be configured via the `Urls` setting in `appsettings.json`
+or via the `--urls` command-line argument:
+
+```bash
+./Tellurian.Trains.WiFreds --urls http://*:8080
+```
+
 ## Configuration
 
 All settings are in `appsettings.json`:
@@ -159,6 +177,7 @@ All settings are in `appsettings.json`:
 | `WiFred` | `Port` | `12090` | TCP port for WiFred connections |
 | `WiFred` | `HeartbeatTimeoutSeconds` | `10` | Seconds before inactive client triggers e-stop |
 | `WiFred` | `ServiceName` | `WiFred Server` | mDNS service name |
+| `WiFred` | `OpenBrowserOnStart` | `false` | Open the web dashboard in the default browser on startup |
 | `Throttling` | `SpeedTimeThresholdMs` | `150` | Min ms between forwarded speed commands per loco |
 | `Throttling` | `SpeedStepThreshold` | `2` | Min speed step change to bypass time threshold |
 | `Throttling` | `GlobalMessageRatePerSecond` | `20` | Max command station messages/sec across all clients |

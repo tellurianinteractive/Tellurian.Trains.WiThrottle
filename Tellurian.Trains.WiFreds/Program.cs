@@ -1,15 +1,26 @@
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Net;
 using Tellurian.Trains.Adapters.LocoNet;
 using Tellurian.Trains.Communications.Channels;
 using Tellurian.Trains.Communications.Interfaces.Locos;
 using Tellurian.Trains.Protocols.LocoNet;
+using Tellurian.Trains.WiFreds.Components;
 using Tellurian.Trains.WiFreds.Configuration;
 using Tellurian.Trains.WiFreds.Development;
 using Tellurian.Trains.WiFreds.Server;
 using Tellurian.Trains.WiFreds.Throttling;
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
+if (!builder.Environment.IsDevelopment())
+{
+    builder.WebHost.UseStaticWebAssets();
+}
+
+// Blazor
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+builder.Services.AddLocalization();
 
 // Configuration
 builder.Services.Configure<WiFredSettings>(builder.Configuration.GetSection("WiFred"));
@@ -120,10 +131,37 @@ builder.Services.AddSingleton<ThrottledLocoController>();
 builder.Services.AddHostedService<WiFredTcpServer>();
 builder.Services.AddHostedService<MdnsAdvertiser>();
 
-// wiFRED discovery
+// wiFRED discovery — register as singleton so Blazor pages can inject it
 builder.Services.Configure<WiFredDiscoverySettings>(builder.Configuration.GetSection("WiFredDiscovery"));
 builder.Services.AddHttpClient();
-builder.Services.AddHostedService<WiFredDiscoveryService>();
+builder.Services.AddSingleton<WiFredDiscoveryService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<WiFredDiscoveryService>());
 
-var host = builder.Build();
-host.Run();
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+}
+
+var supportedCultures = new[] { "en", "sv", "da", "nb", "de" };
+app.UseRequestLocalization(new RequestLocalizationOptions()
+    .SetDefaultCulture("en")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures));
+
+app.UseAntiforgery();
+app.MapStaticAssets();
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
+
+if (app.Configuration.GetValue<bool>("WiFred:OpenBrowserOnStart"))
+{
+    app.Lifetime.ApplicationStarted.Register(() =>
+    {
+        var url = app.Urls.FirstOrDefault() ?? "http://localhost:5000";
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    });
+}
+
+app.Run();
