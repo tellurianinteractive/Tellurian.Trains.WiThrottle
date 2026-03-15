@@ -37,7 +37,7 @@ jobs:
         run: |
           for rid in win-x64 linux-arm linux-arm64; do
             rm -f "publish/${rid}/appsettings.Development.json"
-            cp wiFred.md wiFRED.sv.md "publish/${rid}/"
+            cp wiFRED.md wiFRED.sv.md "publish/${rid}/"
             cd "publish/${rid}" && zip -r "../${rid}.zip" . && cd ../..
           done
 
