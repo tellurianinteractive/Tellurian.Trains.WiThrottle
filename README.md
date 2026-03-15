@@ -3,7 +3,7 @@
 A .NET 10 WiThrottle protocol server that enables [WiFred](https://github.com/newHeiko/wiFred) throttles
 to control model trains via any command station that has LocoNet support or a network API (e.g. Roco Z21).
 
-**Important: This implementation *only* supports the part of the wiThrottle
+**Important: This implementation *only*** supports the part of the wiThrottle
 protocol acually used by the **wiFRED**.**
 
 ## References
@@ -13,9 +13,9 @@ protocol acually used by the **wiFRED**.**
 
 ## Features
 
-- WiThrottle protocol v2.0 (WiFred-compatible subset)
-- Up to 4 locos per WiFred, multiple concurrent WiFred connections
-- mDNS service discovery (`_withrottle._tcp`)
+- WiThrottle protocol v2.0 (wiFred-compatible subset)
+- Up to 4 locos per WiFred, multiple concurrent wiFred connections
+- mDNS service discovwry (`_withrottle._tcp`)
 - Heartbeat monitoring with automatic emergency stop
 - Per-loco speed debouncing and global rate limiting
 - Momentary (e.g. horn) and latching (e.g. lights) function buttons, as configured in the wiFRED
@@ -31,15 +31,17 @@ all other adapters communicate with the command station via its own protocol or 
 Pick **one** of the following:
 
 - **ROCO Z21** (or compatible) — communicates via the Z21 UDP API, no LocoNet bus connection needed.
-- **Command station with LocoNet** — via a LoconetOverTcp server (e.g. JMRI, Rocrail, or LbServer) for TCP access.
+- **Command station with LocoNet** — via a LoconetOverTcp server (e.g. Rocrail or LbServer) for TCP access. Also JMRI supports LocoNet over TCP but also have its own wiThrottle server.
 - **Command station with LocoNet** — via a UDP multicast gateway (e.g. loconetd or GCA101 LocoBuffer-UDP).
 - **USB-to-LocoNet device** — connects directly to the LocoNet bus via serial communication, e.g. the [RR-Cirkits LocoBuffer-NG](https://digira.se/webshop/ws-/products/locobuffer-ng).
 
 ## Getting Started
 
+Settings are in the `appsettings.json` file in the programs folder. You can have all different protocols defined, and the one used is the one set in `CommandStation` `Type`.
+
 ### Running with Serial Communication
 
-Edit `appsettings.json` to set your serial port, then run:
+Set the command station type to `Serial` and configure the serial port. The baud rate is the standard value used:
 
 ```json
 {
@@ -55,7 +57,7 @@ Edit `appsettings.json` to set your serial port, then run:
 
 ### Running with ROCO Z21
 
-Set the command station type to `Z21` and configure the Z21 network address:
+Set the command station type to `Z21` and configure the Z21 network address. The command and feedback port numbers are standard for Z21:
 
 ```json
 {
@@ -72,7 +74,7 @@ Set the command station type to `Z21` and configure the Z21 network address:
 
 ### Running with LocoNet over TCP
 
-Connect to a LoconetOverTcp server (e.g. JMRI, Rocrail, or LbServer):
+Connect to a LoconetOverTcp server (e.g. Rocrail or LbServer):
 
 ```json
 {
@@ -130,8 +132,12 @@ copy it to the PiLocoBuffer, and run it alongside the LbServer.
 
 ### Linux
 
+Download the version that correspond to your computer architecture:
+- 32 bit use **linux-arm.zip**
+- 64 bit use **linux-arm64.zip**
+
 Install and run for the first time
-1. unzip **linux-arm64.zip** -d wifredserver **<- or the zip for the platform you run on**
+1. unzip ***version*.zip** -d wifredserver 
 1. cd wifredserver
 2. configure control station to use in **appsettings.json**
 1. chmod +x Tellurian.Trains.WiFreds
@@ -143,7 +149,7 @@ This is operating system specific and not covered here.
 ### Windows
 
 Install and run for the first time
-1. unzip **linux-arm64.zip** -d wifredserver **<- or the zip for the platform you run on**
+1. unzip **win-x64.zip** -d wifredserver 
 1. cd wifredserver
 2. configure control station to use in **appsettings.json**
 1. ./Tellurian.Trains.WiFreds  **<- this starts the app, only thing needed when running later**
@@ -159,6 +165,9 @@ The page auto-refreshes every 5 seconds and displays:
 - Device name, IP address, and configured loco addresses
 - Last seen timestamp
 - Loco address conflicts (when multiple wiFREDs control the same loco)
+
+It is possible to configure in `appsettings.json` that the web dashboard should autostart. If you are running headless (without screen) this setting should
+remain `false`.
 
 The web UI is available at `http://<server-address>:5000` by default.
 The web port can be configured via the `Urls` setting in `appsettings.json`
