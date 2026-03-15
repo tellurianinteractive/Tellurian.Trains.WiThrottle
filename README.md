@@ -1,4 +1,4 @@
-# WiThrottle Server for WiFred
+# WiFred Server
 
 A .NET 10 WiThrottle protocol server that enables [WiFred](https://github.com/newHeiko/wiFred) throttles
 to control model trains via any command station that has LocoNet support or a network API (e.g. Roco Z21).
@@ -133,8 +133,8 @@ Install and run for the first time
 1. unzip **linux-arm64.zip** -d wifredserver **<- or the zip for the platform you run on**
 1. cd wifredserver
 2. configure control station to use in **appsettings.json**
-1. chmod +x Tellurian.Trains.WiThrottles
-1. ./Tellurian.Trains.WiThrottles  **<- this starts the app, only thing needed when running later**
+1. chmod +x Tellurian.Trains.WiFreds
+1. ./Tellurian.Trains.WiFreds  **<- this starts the app, only thing needed when running later**
 
 You may also consider to use autostart of the wiFRED Server.
 This is operating system specific and not covered here.
@@ -145,7 +145,7 @@ Install and run for the first time
 1. unzip **linux-arm64.zip** -d wifredserver **<- or the zip for the platform you run on**
 1. cd wifredserver
 2. configure control station to use in **appsettings.json**
-1. ./Tellurian.Trains.WiThrottles  **<- this starts the app, only thing needed when running later**
+1. ./Tellurian.Trains.WiFreds  **<- this starts the app, only thing needed when running later**
 
 You may also consider to use autostart of the wiFRED Server.
 This is operating system specific and not covered here.
@@ -156,9 +156,9 @@ All settings are in `appsettings.json`:
 
 | Section | Setting | Default | Description |
 |---------|---------|---------|-------------|
-| `WiThrottle` | `Port` | `12090` | TCP port for WiFred connections |
-| `WiThrottle` | `HeartbeatTimeoutSeconds` | `10` | Seconds before inactive client triggers e-stop |
-| `WiThrottle` | `ServiceName` | `WiThrottle Server` | mDNS service name |
+| `WiFred` | `Port` | `12090` | TCP port for WiFred connections |
+| `WiFred` | `HeartbeatTimeoutSeconds` | `10` | Seconds before inactive client triggers e-stop |
+| `WiFred` | `ServiceName` | `WiFred Server` | mDNS service name |
 | `Throttling` | `SpeedTimeThresholdMs` | `150` | Min ms between forwarded speed commands per loco |
 | `Throttling` | `SpeedStepThreshold` | `2` | Min speed step change to bypass time threshold |
 | `Throttling` | `GlobalMessageRatePerSecond` | `20` | Max command station messages/sec across all clients |
@@ -177,7 +177,7 @@ All settings are in `appsettings.json`:
 | `CommandStation:LocoNetUdp` | `ValidateChecksum` | `true` | Validate LocoNet checksums on received datagrams |
 
 Settings can also be overridden via environment variables or command-line arguments
-using standard .NET configuration (e.g. `WiThrottle__Port=12345`).
+using standard .NET configuration (e.g. `WiFred__Port=12345`).
 
 ## Supported Platforms
 

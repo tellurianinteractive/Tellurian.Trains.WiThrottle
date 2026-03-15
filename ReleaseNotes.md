@@ -5,12 +5,12 @@
 ### wiFRED Device Discovery
 - UDP discovery service that listens for wiFRED broadcast messages on port 51289.
 - Automatically fetches and stores device XML configuration from discovered devices.
-- Tracks active/inactive state: devices are marked inactive when their WiThrottle TCP session ends.
+- Tracks active/inactive state: devices are marked inactive when their WiFred TCP session ends.
 - Detects loco address conflicts when multiple wiFRED devices are configured with the same address.
 
 ## Version 1.0.0
 
-Initial release of the WiThrottle server for wiFRED throttles.
+Initial release of the WiFred server for wiFRED throttles.
 
 ### WiThrottle Protocol
 - Implements WiThrottle protocol v2.0, the subset used by wiFRED devices.

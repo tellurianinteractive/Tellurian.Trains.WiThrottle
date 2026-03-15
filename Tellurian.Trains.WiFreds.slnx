@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Implementation plan.md" />
+    <File Path="README.md" />
+    <File Path="ReleaseNotes.md" />
+    <File Path="Requirements specification.md" />
+    <File Path="wiFRED.md" />
+    <File Path="wiFRED.sv.md" />
+  </Folder>
+  <Project Path="Tellurian.Trains.WiFreds.Tests\Tellurian.Trains.WiFreds.Tests.csproj" />
+  <Project Path="Tellurian.Trains.WiFreds\Tellurian.Trains.WiFreds.csproj" />
+</Solution>
