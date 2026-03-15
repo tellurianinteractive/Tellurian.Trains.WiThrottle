@@ -27,7 +27,7 @@ jobs:
 
       - name: Publish all platforms
         run: |
-          project="Tellurian.Trains.WiThrottles/Tellurian.Trains.WiThrottles.csproj"
+          project="Tellurian.Trains.WiFreds/Tellurian.Trains.WiFreds.csproj"
           common_args="--configuration Release --self-contained true -p:PublishSingleFile=true"
           dotnet publish "$project" $common_args -r win-x64 -o publish/win-x64
           dotnet publish "$project" $common_args -r linux-arm -o publish/linux-arm
@@ -37,7 +37,7 @@ jobs:
         run: |
           for rid in win-x64 linux-arm linux-arm64; do
             rm -f "publish/${rid}/appsettings.Development.json"
-            cp wiFRED.md wiFRED.sv.md "publish/${rid}/"
+            cp wiFred.md wiFRED.sv.md "publish/${rid}/"
             cd "publish/${rid}" && zip -r "../${rid}.zip" . && cd ../..
           done
 
