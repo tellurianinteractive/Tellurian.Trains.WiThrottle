@@ -4,9 +4,10 @@ A .NET 10 WiThrottle protocol server that enables [WiFred](https://github.com/ne
 to control model trains via any command station that has LocoNet support or a network API (e.g. Roco Z21).
 
 **Important: This implementation *only*** supports the part of the wiThrottle
-protocol acually used by the **wiFRED**.**
+protocol acually used by the **wiFRED**.
 
 ## References
+
 - [wiFred source code](https://github.com/newHeiko/wiFred),
 - [JMRI wiThrottle protocol](https://www.jmri.org/help/en/package/jmri/jmrit/withrottle/Protocol.shtml),
 - [wiFRED user manual](https://newheiko.github.io/wiFred/documentation/docu_en.html)
@@ -21,6 +22,7 @@ protocol acually used by the **wiFRED**.**
 - Momentary (e.g. horn) and latching (e.g. lights) function buttons, as configured in the wiFRED
 - LocoNet (serial, TCP, UDP multicast) and Z21 (UDP) command station adapters
 - Web dashboard showing all connected wiFREDs with auto-refresh, including loco address conflict detection
+- Inline editing of loco addresses from the web dashboard, with changes pushed directly to the wiFRED device
 
 ## Prerequisites
 
@@ -37,7 +39,7 @@ Pick **one** of the following:
 
 ## Getting Started
 
-Settings are in the `appsettings.json` file in the programs folder. You can have all different protocols defined, and the one used is the one set in `CommandStation` `Type`.
+Settings are in the `appsettings.json` file in the programs folder. You can have all different protocols defined in the file. The one used is the one given for the command station type.
 
 ### Running with Serial Communication
 
@@ -130,18 +132,18 @@ copy it to the PiLocoBuffer, and run it alongside the LbServer.
 
 ## Installing and Running
 
+You find releases under [Releases](https://github.com/tellurianinteractive/Tellurian.Trains.WiThrottle/releases) on the repository's root page.
+
 ### Linux
 
-Download the version that correspond to your computer architecture:
-- 32 bit use **linux-arm.zip**
-- 64 bit use **linux-arm64.zip**
-
 Install and run for the first time
-1. unzip ***version*.zip** -d wifredserver 
-1. cd wifredserver
-2. configure control station to use in **appsettings.json**
-1. chmod +x Tellurian.Trains.WiFreds
-1. ./Tellurian.Trains.WiFreds  **<- this starts the app, only thing needed when running later**
+
+1. Download **linux-arm.zip** for 32-bit or **linux-arm64.zip** for 64-bit
+2. unzip ***version*.zip** -d wifredserver
+3. cd wifredserver
+4. configure control station to use in **appsettings.json**
+5. chmod +x Tellurian.Trains.WiFreds
+6. ./Tellurian.Trains.WiFreds  **<- this starts the app, only thing needed when running later**
 
 You may also consider to use autostart of the wiFRED Server.
 This is operating system specific and not covered here.
@@ -149,10 +151,12 @@ This is operating system specific and not covered here.
 ### Windows
 
 Install and run for the first time
-1. unzip **win-x64.zip** -d wifredserver 
-1. cd wifredserver
-2. configure control station to use in **appsettings.json**
-1. ./Tellurian.Trains.WiFreds  **<- this starts the app, only thing needed when running later**
+
+1. Download **win-x64.zip**.
+2. unzip **win-x64.zip** -d wifredserver
+3. cd wifredserver
+4. configure control station to use in **appsettings.json**
+5. ./Tellurian.Trains.WiFreds  **<- this starts the app, only thing needed when running later**
 
 You may also consider to use autostart of the wiFRED Server.
 This is operating system specific and not covered here.
@@ -162,9 +166,14 @@ This is operating system specific and not covered here.
 The server includes a built-in web dashboard that shows all currently connected wiFRED devices.
 The page auto-refreshes every 5 seconds and displays:
 
-- Device name, IP address, and configured loco addresses
+- Device name, IP address, firmware version, and battery voltage
+- All 4 loco address slots as individual columns
 - Last seen timestamp
 - Loco address conflicts (when multiple wiFREDs control the same loco)
+
+Loco addresses can be edited inline: click an address value to open an edit field,
+change the value, and click Save. The server sends the update to the wiFRED
+and re-reads its configuration to confirm the change.
 
 It is possible to configure in `appsettings.json` that the web dashboard should autostart. If you are running headless (without screen) this setting should
 remain `false`.
@@ -181,28 +190,29 @@ or via the `--urls` command-line argument:
 
 All settings are in `appsettings.json`:
 
-| Section | Setting | Default | Description |
-|---------|---------|---------|-------------|
-| `WiFred` | `Port` | `12090` | TCP port for WiFred connections |
-| `WiFred` | `HeartbeatTimeoutSeconds` | `10` | Seconds before inactive client triggers e-stop |
-| `WiFred` | `ServiceName` | `WiFred Server` | mDNS service name |
-| `WiFred` | `OpenBrowserOnStart` | `false` | Open the web dashboard in the default browser on startup |
-| `Throttling` | `SpeedTimeThresholdMs` | `150` | Min ms between forwarded speed commands per loco |
-| `Throttling` | `SpeedStepThreshold` | `2` | Min speed step change to bypass time threshold |
-| `Throttling` | `GlobalMessageRatePerSecond` | `20` | Max command station messages/sec across all clients |
-| `CommandStation` | `Type` | — | `Serial`, `Z21`, `LocoNetTcp`, or `LocoNetUdp` (required) |
-| `CommandStation:SerialPort` | `PortName` | `COM3` | Serial port for LocoNet |
-| `CommandStation:SerialPort` | `BaudRate` | `57600` | Baud rate for LocoNet |
-| `CommandStation:Z21` | `Address` | `192.168.0.111` | Z21 IP address |
-| `CommandStation:Z21` | `CommandPort` | `21105` | Z21 command UDP port |
-| `CommandStation:Z21` | `FeedbackPort` | `21106` | Z21 feedback UDP port |
-| `CommandStation:LocoNetTcp` | `Hostname` | `localhost` | LoconetOverTcp server hostname |
-| `CommandStation:LocoNetTcp` | `Port` | `1234` | LoconetOverTcp server port |
-| `CommandStation:LocoNetUdp` | `MulticastGroup` | `224.0.0.1` | UDP multicast group address |
-| `CommandStation:LocoNetUdp` | `ListenPort` | `1235` | UDP multicast listen port |
-| `CommandStation:LocoNetUdp` | `SendAddress` | `224.0.0.1` | UDP multicast send address |
-| `CommandStation:LocoNetUdp` | `SendPort` | `1235` | UDP multicast send port |
-| `CommandStation:LocoNetUdp` | `ValidateChecksum` | `true` | Validate LocoNet checksums on received datagrams |
+
+| Section                     | Setting                      | Default         | Description                                               |
+| ----------------------------- | ------------------------------ | ----------------- | ----------------------------------------------------------- |
+| `WiFred`                    | `Port`                       | `12090`         | TCP port for WiFred connections                           |
+| `WiFred`                    | `HeartbeatTimeoutSeconds`    | `10`            | Seconds before inactive client triggers e-stop            |
+| `WiFred`                    | `ServiceName`                | `WiFred Server` | mDNS service name                                         |
+| `WiFred`                    | `OpenBrowserOnStart`         | `false`         | Open the web dashboard in the default browser on startup  |
+| `Throttling`                | `SpeedTimeThresholdMs`       | `150`           | Min ms between forwarded speed commands per loco          |
+| `Throttling`                | `SpeedStepThreshold`         | `2`             | Min speed step change to bypass time threshold            |
+| `Throttling`                | `GlobalMessageRatePerSecond` | `20`            | Max command station messages/sec across all clients       |
+| `CommandStation`            | `Type`                       | —              | `Serial`, `Z21`, `LocoNetTcp`, or `LocoNetUdp` (required) |
+| `CommandStation:SerialPort` | `PortName`                   | `COM3`          | Serial port for LocoNet                                   |
+| `CommandStation:SerialPort` | `BaudRate`                   | `57600`         | Baud rate for LocoNet                                     |
+| `CommandStation:Z21`        | `Address`                    | `192.168.0.111` | Z21 IP address                                            |
+| `CommandStation:Z21`        | `CommandPort`                | `21105`         | Z21 command UDP port                                      |
+| `CommandStation:Z21`        | `FeedbackPort`               | `21106`         | Z21 feedback UDP port                                     |
+| `CommandStation:LocoNetTcp` | `Hostname`                   | `localhost`     | LoconetOverTcp server hostname                            |
+| `CommandStation:LocoNetTcp` | `Port`                       | `1234`          | LoconetOverTcp server port                                |
+| `CommandStation:LocoNetUdp` | `MulticastGroup`             | `224.0.0.1`     | UDP multicast group address                               |
+| `CommandStation:LocoNetUdp` | `ListenPort`                 | `1235`          | UDP multicast listen port                                 |
+| `CommandStation:LocoNetUdp` | `SendAddress`                | `224.0.0.1`     | UDP multicast send address                                |
+| `CommandStation:LocoNetUdp` | `SendPort`                   | `1235`          | UDP multicast send port                                   |
+| `CommandStation:LocoNetUdp` | `ValidateChecksum`           | `true`          | Validate LocoNet checksums on received datagrams          |
 
 Settings can also be overridden via environment variables or command-line arguments
 using standard .NET configuration (e.g. `WiFred__Port=12345`).

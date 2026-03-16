@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version 1.3.0
+
+### Web Dashboard
+- Expanded device table with firmware version and battery voltage columns.
+- Each of the 4 loco address slots shown as a separate column (Loco 1–4).
+- Inline editing of loco addresses: click an address to edit, save to push the change to the wiFRED via its HTTP API, then re-fetch the XML configuration to confirm.
+
 ## Version 1.2.0
 
 ### Web Dashboard
