@@ -16,6 +16,7 @@ public sealed class WiFredTcpServer : BackgroundService
 {
     private readonly WiFredSettings _settings;
     private readonly ThrottledLocoController _controller;
+    private readonly ActiveLocoTracker _tracker;
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<WiFredTcpServer> _logger;
     private readonly ConcurrentDictionary<string, SessionHandler> _activeSessions = new();
@@ -23,11 +24,13 @@ public sealed class WiFredTcpServer : BackgroundService
     public WiFredTcpServer(
         IOptions<WiFredSettings> settings,
         ThrottledLocoController controller,
+        ActiveLocoTracker tracker,
         ILoggerFactory loggerFactory,
         ILogger<WiFredTcpServer> logger)
     {
         _settings = settings.Value;
         _controller = controller;
+        _tracker = tracker;
         _loggerFactory = loggerFactory;
         _logger = logger;
     }
@@ -70,7 +73,7 @@ public sealed class WiFredTcpServer : BackgroundService
     {
         var session = new ThrottleSession();
         var sessionLogger = _loggerFactory.CreateLogger($"WiFred.Session.{clientId}");
-        var handler = new SessionHandler(session, _controller, sessionLogger);
+        var handler = new SessionHandler(session, _controller, _tracker, clientId, sessionLogger);
         _activeSessions[clientId] = handler;
         var clientIp = (client.Client.RemoteEndPoint as IPEndPoint)?.Address;
 

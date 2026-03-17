@@ -18,10 +18,7 @@ wiFRED-enheter på samma nätverk kan hitta den automatiskt.
 ### UDP-broadcast
 
 Efter anslutning till WiFi skickar wiFRED strängen `"wiFred"` som broadcast
-på UDP-port **51289**. Serverns `WiFredDiscoveryService` lyssnar på denna
-port och hämtar vid mottagning enhetens konfiguration via
-`GET http://{enhetsIP}/api/getConfigXML` för att upptäcka lokadresskonflikter
-mellan anslutna enheter.
+på UDP-port **51289**. S
 
 ## Protokollmeddelanden
 
@@ -30,42 +27,46 @@ där `<;>` är den bokstavliga avgränsaren. Meddelanden avslutas med nyrad.
 
 ### Anslutningshandskaning
 
-| Riktning | Meddelande | Syfte |
-|----------|------------|-------|
-| Server → Klient | `VN2.0` | Protokollversion |
-| Server → Klient | `*{sekunder}` | Hjärtslagstimeout |
-| Klient → Server | `N{namn}` | Körkontrollens namn |
-| Klient → Server | `HU{macHex}` | Hårdvaruidentifierare |
-| Klient → Server | `*+` | Anmäl intresse för hjärtslagsövervakning |
+
+| Riktning         | Meddelande    | Syfte                                        |
+| ------------------ | --------------- | ---------------------------------------------- |
+| Server → Klient | `VN2.0`       | Protokollversion                             |
+| Server → Klient | `*{sekunder}` | Hjärtslagstimeout                           |
+| Klient → Server | `N{namn}`     | Körkontrollens namn                         |
+| Klient → Server | `HU{macHex}`  | Hårdvaruidentifierare                       |
+| Klient → Server | `*+`          | Anmäl intresse för hjärtslagsövervakning |
 
 ### Lokförvärv / Frigöring
 
-| Meddelande | Beskrivning |
-|------------|-------------|
+
+| Meddelande             | Beskrivning                                                                                             |
+| ------------------------ | --------------------------------------------------------------------------------------------------------- |
 | `MT+{lokId}<;>{lokId}` | Förvärva ett lok. Servern svarar med aktuella funktionstillstånd, riktning och hastighetsstegsläge. |
-| `MT-{lokId}<;>r` | Frigör ett lok. Servern nödstoppar det. |
+| `MT-{lokId}<;>r`       | Frigör ett lok. Servern nödstoppar det.                                                               |
 
 Lok-ID använder formatet `L{nummer}` för långa (utökade) DCC-adresser
 och `S{nummer}` för korta adresser.
 
 ### Hastighet, riktning och nödstopp
 
-| Meddelande | Beskrivning |
-|------------|-------------|
-| `MTA{target}<;>V{hastighet}` | Sätt hastighet (0–126) |
-| `MTA{target}<;>R{0\|1}` | Sätt riktning (0 = bakåt, 1 = framåt) |
-| `MTA{target}<;>X` | Nödstopp |
+
+| Meddelande                   | Beskrivning                              |
+| ------------------------------ | ------------------------------------------ |
+| `MTA{target}<;>V{hastighet}` | Sätt hastighet (0–126)                 |
+| `MTA{target}<;>R{0|1}`       | Sätt riktning (0 = bakåt, 1 = framåt) |
+| `MTA{target}<;>X`            | Nödstopp                                |
 
 `{target}` är antingen ett specifikt lok-ID eller `*` för att adressera alla
 förvärvade lok.
 
 ### Funktioner
 
-| Meddelande | Beskrivning |
-|------------|-------------|
-| `MTA{target}<;>F{0\|1}{n}` | Knapptryckning (1) / släpp (0) för funktion *n* |
-| `MTA{target}<;>f{0\|1}{n}` | Tvinga funktion *n* på (1) eller av (0) |
-| `MTA{target}<;>m{0\|1}{n}` | Sätt funktionsläge för *n*: 0 = låsande, 1 = momentan |
+
+| Meddelande                | Beskrivning                                              |
+| --------------------------- | ---------------------------------------------------------- |
+| `MTA{target}<;>F{0|1}{n}` | Knapptryckning (1) / släpp (0) för funktion*n*         |
+| `MTA{target}<;>f{0|1}{n}` | Tvinga funktion*n* på (1) eller av (0)                  |
+| `MTA{target}<;>m{0|1}{n}` | Sätt funktionsläge för*n*: 0 = låsande, 1 = momentan |
 
 För låsande funktioner växlar servern funktionstillståndet vid
 knapptryckning (`F1`) och ignorerar släpp (`F0`).
@@ -73,20 +74,23 @@ För momentana funktioner skickar servern knapptillståndet direkt.
 
 ### Hastighetsstegsläge
 
-| Meddelande | Beskrivning |
-|------------|-------------|
+
+| Meddelande               | Beskrivning                    |
+| -------------------------- | -------------------------------- |
 | `MTA{target}<;>s{läge}` | Deklarera hastighetsstegsläge |
 
-wiFRED kan skicka en hastighetsstegsmodssträng som `128`, `28`, `14`
-eller andra. Servern tar emot men agerar för närvarande inte på detta meddelande.
+wiFRED kan skicka meddelande om antal hastighetsstegs `128`, `28`, `14`
+eller andra. Servern tar emot men agerar för närvarande inte på detta meddelande
+då wiFRED endast sänder hastighetsläge `128`.
 
 ### Sessionskontroll
 
-| Meddelande | Beskrivning |
-|------------|-------------|
-| `*+` | Aktivera hjärtslagsövervakning |
-| `*` | Hjärtslag (keepalive) |
-| `Q` | Avsluta — servern nödstoppar och frigör alla lok |
+
+| Meddelande | Beskrivning                                         |
+| ------------ | ----------------------------------------------------- |
+| `*+`       | Aktivera hjärtslagsövervakning                    |
+| `*`        | Hjärtslag (keepalive)                              |
+| `Q`        | Avsluta — servern nödstoppar och frigör alla lok |
 
 ## Hjärtslag
 
@@ -96,9 +100,13 @@ sedan **40 % av serverns annonserade timeout** som sitt eget keepalive-intervall
 Om servern inte tar emot någon trafik inom timeout-perioden nödstoppar den
 sessionens lok.
 
-## Hastighetsbegränsning av hastighetskommandon
+## Begränsning av hastighetskommandon
 
-wiFRED hastighetsbegränsar hastighetskommandon med en spärrtid på **150 ms**
-(`SPEED_HOLDOFF_PERIOD`). Servern tillämpar sin egen hastighetsbegränsning
+Hastighetskommandon styr lokens hastighet.
+
+wiFRED begränsar hastighetskommandon med en spärrtid på **150 ms**
+(`SPEED_HOLDOFF_PERIOD`).
+
+wiFRED Servern tillämpar sin egen begränsning av hastighetskommandon
 (konfigurerbar via `ThrottlingSettings.SpeedTimeThresholdMs`, standard
 150 ms) för att jämna ut skurar från alla klienter.

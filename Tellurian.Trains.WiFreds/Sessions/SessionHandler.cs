@@ -14,12 +14,16 @@ public sealed class SessionHandler
 {
     private readonly ThrottleSession _session;
     private readonly ThrottledLocoController _controller;
+    private readonly ActiveLocoTracker _tracker;
+    private readonly string _sessionId;
     private readonly ILogger _logger;
 
-    public SessionHandler(ThrottleSession session, ThrottledLocoController controller, ILogger logger)
+    public SessionHandler(ThrottleSession session, ThrottledLocoController controller, ActiveLocoTracker tracker, string sessionId, ILogger logger)
     {
         _session = session;
         _controller = controller;
+        _tracker = tracker;
+        _sessionId = sessionId;
         _logger = logger;
     }
 
@@ -39,7 +43,7 @@ public sealed class SessionHandler
             WiFredMessage.HeartbeatOptIn => HandleHeartbeatOptIn(),
             WiFredMessage.Heartbeat => HandleHeartbeat(),
             WiFredMessage.Quit => await HandleQuitAsync(cancellationToken),
-            WiFredMessage.AcquireLoco m => HandleAcquireLoco(m),
+            WiFredMessage.AcquireLoco m => await HandleAcquireLocoAsync(m, cancellationToken),
             WiFredMessage.ReleaseLoco m => await HandleReleaseLocoAsync(m, cancellationToken),
             WiFredMessage.SetSpeed m => await HandleSetSpeedAsync(m, cancellationToken),
             WiFredMessage.SetDirection m => await HandleSetDirectionAsync(m, cancellationToken),
@@ -82,7 +86,7 @@ public sealed class SessionHandler
         return null;
     }
 
-    private string? HandleAcquireLoco(WiFredMessage.AcquireLoco message)
+    private async Task<string?> HandleAcquireLocoAsync(WiFredMessage.AcquireLoco message, CancellationToken cancellationToken)
     {
         var address = LocoAddress.TryParse(message.LocoId);
         if (address is null)
@@ -100,8 +104,26 @@ public sealed class SessionHandler
             return null;
         }
 
-        if (_logger.IsEnabled(LogLevel.Information))
-            _logger.LogInformation("Acquired loco {LocoId} (address {Address})", message.LocoId, address.Value.Number);
+        _tracker.MarkAcquired(address.Value.Number, _sessionId);
+
+        var locoInfo = await _controller.GetLocoInfoAsync(address.Value, cancellationToken);
+        if (locoInfo is not null)
+        {
+            loco.Speed = locoInfo.Speed.CurrentStep;
+            loco.Direction = locoInfo.Direction;
+            for (var i = 0; i < locoInfo.FunctionStates.Length && i < loco.FunctionStates.Length; i++)
+                loco.FunctionStates[i] = locoInfo.FunctionStates[i];
+
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Acquired loco {LocoId} (address {Address}) with state from command station",
+                    message.LocoId, address.Value.Number);
+        }
+        else
+        {
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Acquired loco {LocoId} (address {Address}) with default state",
+                    message.LocoId, address.Value.Number);
+        }
 
         return BuildAcquisitionResponse(loco);
     }
@@ -113,6 +135,7 @@ public sealed class SessionHandler
 
         await _controller.EmergencyStopAsync(loco.Address, cancellationToken);
         _controller.RemoveSpeedThrottler(loco.Address.Number);
+        _tracker.MarkReleased(loco.Address.Number, _sessionId);
         _session.TryRemoveLoco(message.LocoId);
 
         if (_logger.IsEnabled(LogLevel.Information))
@@ -219,6 +242,7 @@ public sealed class SessionHandler
             await _controller.EmergencyStopAsync(loco.Address, cancellationToken);
             _controller.RemoveSpeedThrottler(loco.Address.Number);
         }
+        _tracker.ReleaseAll(_sessionId);
     }
 
     private async Task<string?> HandleQuitAsync(CancellationToken cancellationToken)

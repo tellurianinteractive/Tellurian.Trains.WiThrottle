@@ -33,4 +33,11 @@ public sealed class LoggingLocoController(ILogger<LoggingLocoController> logger)
                 locoFunction.Number, locoFunction.IsOn ? "ON" : "OFF", address.Number);
         return true;
     }
+
+    public Task<LocoInfo?> GetLocoInfoAsync(Address address, CancellationToken cancellationToken = default)
+    {
+        if (logger.IsEnabled(LogLevel.Debug))
+            logger.LogDebug("GetLocoInfo for loco {Address}", address.Number);
+        return Task.FromResult<LocoInfo?>(null);
+    }
 }

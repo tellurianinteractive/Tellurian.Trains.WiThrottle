@@ -2,7 +2,9 @@
 @rendermode InteractiveServer
 @using Tellurian.Trains.WiFreds.Resources
 @using Tellurian.Trains.WiFreds.Server
+@using Tellurian.Trains.WiFreds.Sessions
 @inject WiFredDiscoveryService DiscoveryService
+@inject ActiveLocoTracker LocoTracker
 @implements IDisposable
 
 <PageTitle>@Messages.ConnectedWiFREDs</PageTitle>
@@ -27,6 +29,7 @@ else
                     <th>@string.Format(Messages.LocoSlot, i)</th>
                 }
                 <th>@Messages.LastSeen</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -40,7 +43,10 @@ else
                     <td>@(device.BatteryVoltage ?? "-")</td>
                     @foreach (var slot in slots)
                     {
-                        <td class="loco-cell">
+                        var statusClass = slot.Address > 0
+                            ? (LocoTracker.IsActive(slot.Address) ? "loco-active" : "loco-inactive")
+                            : "";
+                        <td class="loco-cell @statusClass">
                             @if (IsEditing(device, slot.Slot))
                             {
                                 <div class="loco-edit">
@@ -58,6 +64,7 @@ else
                         </td>
                     }
                     <td>@device.LastSeen.LocalDateTime.ToString("HH:mm:ss")</td>
+                    <td><a class="configure-btn" href="http://@device.Address/" target="_blank">@Messages.Configure</a></td>
                 </tr>
             }
         </tbody>
@@ -87,103 +94,6 @@ else
         </tbody>
     </table>
 }
-
-<style>
-    h2, h3 {
-        color: #eee;
-        margin-bottom: 12px;
-    }
-
-    .no-devices {
-        color: #888;
-        font-style: italic;
-    }
-
-    .device-table, .conflict-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 24px;
-    }
-
-    .device-table th, .device-table td,
-    .conflict-table th, .conflict-table td {
-        text-align: left;
-        padding: 8px 12px;
-        border-bottom: 1px solid #333;
-    }
-
-    .device-table th, .conflict-table th {
-        color: #aaa;
-        font-weight: 600;
-        border-bottom: 2px solid #555;
-    }
-
-    .device-table td, .conflict-table td {
-        color: #ddd;
-    }
-
-    .conflict-table td {
-        color: #f88;
-    }
-
-    .last-updated {
-        color: #666;
-        font-size: 0.85rem;
-    }
-
-    .loco-value {
-        cursor: pointer;
-        padding: 2px 8px;
-        border-radius: 4px;
-    }
-
-    .loco-value:hover {
-        background-color: #444;
-    }
-
-    .loco-edit {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .loco-edit input {
-        width: 70px;
-        padding: 2px 6px;
-        background: #333;
-        color: #eee;
-        border: 1px solid #666;
-        border-radius: 4px;
-    }
-
-    .save-btn {
-        padding: 2px 8px;
-        background: #2a7a2a;
-        color: #eee;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.85rem;
-    }
-
-    .save-btn:hover {
-        background: #3a9a3a;
-    }
-
-    .cancel-btn {
-        padding: 2px 6px;
-        background: transparent;
-        color: #888;
-        border: none;
-        cursor: pointer;
-        font-size: 1rem;
-    }
-
-    .cancel-btn:hover {
-        color: #f88;
-    }
-</style>
-
 @code {
     private IReadOnlyList<WiFredDevice> _devices = [];
     private IReadOnlyList<LocoAddressConflict> _conflicts = [];

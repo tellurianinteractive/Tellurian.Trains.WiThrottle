@@ -67,6 +67,11 @@ public sealed class ThrottledLocoController : IDisposable
         return await _inner.SetFunctionAsync(address, locoFunction, cancellationToken);
     }
 
+    public Task<LocoInfo?> GetLocoInfoAsync(Address address, CancellationToken cancellationToken = default)
+    {
+        return _inner.GetLocoInfoAsync(address, cancellationToken);
+    }
+
     public void RemoveSpeedThrottler(int addressNumber)
     {
         if (_speedThrottlers.TryRemove(addressNumber, out var throttler))

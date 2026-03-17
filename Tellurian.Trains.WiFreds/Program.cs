@@ -9,6 +9,7 @@ using Tellurian.Trains.WiFreds.Components;
 using Tellurian.Trains.WiFreds.Configuration;
 using Tellurian.Trains.WiFreds.Development;
 using Tellurian.Trains.WiFreds.Server;
+using Tellurian.Trains.WiFreds.Sessions;
 using Tellurian.Trains.WiFreds.Throttling;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -126,6 +127,9 @@ else
 
 // Throttling
 builder.Services.AddSingleton<ThrottledLocoController>();
+
+// Active loco tracking
+builder.Services.AddSingleton<ActiveLocoTracker>();
 
 // Server
 builder.Services.AddHostedService<WiFredTcpServer>();

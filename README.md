@@ -16,6 +16,7 @@ protocol acually used by the **wiFRED**.
 
 - WiThrottle protocol v2.0 (wiFred-compatible subset)
 - Up to 4 locos per WiFred, multiple concurrent wiFred connections
+- Loco acquisition reports actual state (speed, direction, functions) from the command station
 - mDNS service discovwry (`_withrottle._tcp`)
 - Heartbeat monitoring with automatic emergency stop
 - Per-loco speed debouncing and global rate limiting
@@ -23,6 +24,8 @@ protocol acually used by the **wiFRED**.
 - LocoNet (serial, TCP, UDP multicast) and Z21 (UDP) command station adapters
 - Web dashboard showing all connected wiFREDs with auto-refresh, including loco address conflict detection
 - Inline editing of loco addresses from the web dashboard, with changes pushed directly to the wiFRED device
+- Configure button to open each wiFRED's built-in configuration page
+- Active/inactive loco address indication: green for addresses in use, red for idle
 
 ## Prerequisites
 
@@ -167,8 +170,9 @@ The server includes a built-in web dashboard that shows all currently connected 
 The page auto-refreshes every 5 seconds and displays:
 
 - Device name, IP address, firmware version, and battery voltage
-- All 4 loco address slots as individual columns
+- All 4 loco address slots as individual columns, color-coded: green for addresses actively controlled by a wiFRED session, red for idle addresses
 - Last seen timestamp
+- Configure button to open the wiFRED's own configuration web page
 - Loco address conflicts (when multiple wiFREDs control the same loco)
 
 Loco addresses can be edited inline: click an address value to open an edit field,
@@ -224,6 +228,36 @@ Published as self-contained single-file executables for:
 - **Windows x64** (`win-x64`)
 - **Linux ARM** (`linux-arm`) — e.g. Raspberry Pi (32-bit)
 - **Linux ARM64** (`linux-arm64`) — e.g. Raspberry Pi (64-bit)
+
+## System Requirements
+
+### Server (runs the wiFRED Server application)
+
+The app is built on .NET 10 and published as a self-contained executable, so no separate .NET installation is needed. However, the operating system must meet .NET 10's minimum requirements:
+
+| OS | Minimum Version |
+|----|-----------------|
+| Windows (x64) | Windows 10 or Windows Server 2012 R2 |
+| Linux ARM/ARM64 | Raspberry Pi OS 11 (Bullseye) or later, Ubuntu 22.04+, Debian 11+ |
+| macOS | macOS 15 "Sequoia" or later (no pre-built binary; build from source) |
+
+Windows 7 and Windows 8.1 are **not supported** by .NET 10.
+
+A detailed .NET 10 OS support list can be found [here](https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md).
+
+### Web Dashboard (browser)
+
+The web dashboard uses Blazor Server with SignalR over WebSockets.
+Any device on the network can access it — it does not need to run on the same machine as the server.
+
+| Browser | Minimum Version |
+|---------|-----------------|
+| Google Chrome | Current version |
+| Microsoft Edge | Current version |
+| Mozilla Firefox | Current version |
+| Apple Safari | Current version |
+
+Internet Explorer is **not supported**. Microsoft dropped Blazor support for IE starting with ASP.NET Core 5.0.
 
 ## Known Limitations
 

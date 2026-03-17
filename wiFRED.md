@@ -18,10 +18,7 @@ so that wiFRED devices on the same network can find it automatically.
 ### UDP Broadcast
 
 After connecting to WiFi, the wiFRED broadcasts the string `"wiFred"` on
-UDP port **51289**. The server's `WiFredDiscoveryService` listens on this
-port and, on receiving the broadcast, fetches the device's configuration
-via `GET http://{deviceIP}/api/getConfigXML` to detect loco address
-conflicts between connected devices.
+UDP port **51289**.
 
 ## Protocol Messages
 
@@ -30,42 +27,46 @@ where `<;>` is the literal delimiter. Messages are newline-terminated.
 
 ### Connection Handshake
 
-| Direction | Message | Purpose |
-|-----------|---------|---------|
-| Server → Client | `VN2.0` | Protocol version |
-| Server → Client | `*{seconds}` | Heartbeat timeout |
-| Client → Server | `N{name}` | Throttle name |
-| Client → Server | `HU{macHex}` | Hardware identifier |
-| Client → Server | `*+` | Opt in to heartbeat monitoring |
+
+| Direction        | Message      | Purpose                        |
+| ------------------ | -------------- | -------------------------------- |
+| Server → Client | `VN2.0`      | Protocol version               |
+| Server → Client | `*{seconds}` | Heartbeat timeout              |
+| Client → Server | `N{name}`    | Throttle name                  |
+| Client → Server | `HU{macHex}` | Hardware identifier            |
+| Client → Server | `*+`         | Opt in to heartbeat monitoring |
 
 ### Loco Acquire / Release
 
-| Message | Description |
-|---------|-------------|
+
+| Message                  | Description                                                                                       |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
 | `MT+{locoId}<;>{locoId}` | Acquire a loco. The server responds with current function states, direction, and speed step mode. |
-| `MT-{locoId}<;>r` | Release a loco. The server emergency-stops it. |
+| `MT-{locoId}<;>r`        | Release a loco. The server emergency-stops it.                                                    |
 
 Loco IDs use the format `L{number}` for long (extended) DCC addresses
 and `S{number}` for short addresses.
 
 ### Speed, Direction, and Emergency Stop
 
-| Message | Description |
-|---------|-------------|
-| `MTA{target}<;>V{speed}` | Set speed (0–126) |
-| `MTA{target}<;>R{0\|1}` | Set direction (0 = reverse, 1 = forward) |
-| `MTA{target}<;>X` | Emergency stop |
+
+| Message                  | Description                              |
+| -------------------------- | ------------------------------------------ |
+| `MTA{target}<;>V{speed}` | Set speed (0–126)                       |
+| `MTA{target}<;>R{0|1}`   | Set direction (0 = reverse, 1 = forward) |
+| `MTA{target}<;>X`        | Emergency stop                           |
 
 The `{target}` is either a specific loco ID or `*` to address all
 acquired locos.
 
 ### Functions
 
-| Message | Description |
-|---------|-------------|
-| `MTA{target}<;>F{0\|1}{n}` | Button press (1) / release (0) for function *n* |
-| `MTA{target}<;>f{0\|1}{n}` | Force function *n* on (1) or off (0) |
-| `MTA{target}<;>m{0\|1}{n}` | Set function *n* mode: 0 = latching, 1 = momentary |
+
+| Message                   | Description                                       |
+| --------------------------- | --------------------------------------------------- |
+| `MTA{target}<;>F{0|1}{n}` | Button press (1) / release (0) for function*n*    |
+| `MTA{target}<;>f{0|1}{n}` | Force function*n* on (1) or off (0)               |
+| `MTA{target}<;>m{0|1}{n}` | Set function*n* mode: 0 = latching, 1 = momentary |
 
 For latching functions, the server toggles the function state on
 button-press (`F1`) and ignores button-release (`F0`).
@@ -73,20 +74,23 @@ For momentary functions, the server passes the button state directly.
 
 ### Speed Step Mode
 
-| Message | Description |
-|---------|-------------|
+
+| Message                 | Description             |
+| ------------------------- | ------------------------- |
 | `MTA{target}<;>s{mode}` | Declare speed step mode |
 
 The wiFRED may send a speed step mode string such as `128`, `28`, `14`,
-or others. The server currently acknowledges but does not act on this message.
+or others. The server currently acknowledges but does not act on this message
+because the wiFRED only sends step mode `128`.
 
 ### Session Control
 
-| Message | Description |
-|---------|-------------|
-| `*+` | Enable heartbeat monitoring |
-| `*` | Heartbeat keepalive |
-| `Q` | Quit — server emergency-stops and releases all locos |
+
+| Message | Description                                           |
+| --------- | ------------------------------------------------------- |
+| `*+`    | Enable heartbeat monitoring                           |
+| `*`     | Heartbeat keepalive                                   |
+| `Q`     | Quit — server emergency-stops and releases all locos |
 
 ## Heartbeat
 

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Tellurian.Trains.WiFreds.Configuration;
 using Tellurian.Trains.WiFreds.Server;
+using Tellurian.Trains.WiFreds.Sessions;
 using Tellurian.Trains.WiFreds.Tests.Helpers;
 using Tellurian.Trains.WiFreds.Throttling;
 
@@ -46,6 +47,7 @@ public class SimulatedWiFredTests
         var server = new WiFredTcpServer(
             serverSettings,
             controller,
+            new ActiveLocoTracker(),
             NullLoggerFactory.Instance,
             NullLogger<WiFredTcpServer>.Instance);
 
@@ -152,6 +154,7 @@ public class SimulatedWiFredTests
         var server = new WiFredTcpServer(
             serverSettings,
             controller,
+            new ActiveLocoTracker(),
             NullLoggerFactory.Instance,
             NullLogger<WiFredTcpServer>.Instance);
 

@@ -132,4 +132,9 @@ internal static partial class Messages
     ///   Looks up a localized string similar to Loco {0}.
     /// </summary>
     internal static string LocoSlot => ResourceManager.GetString("LocoSlot", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Configure.
+    /// </summary>
+    internal static string Configure => ResourceManager.GetString("Configure", Culture)!;
 }

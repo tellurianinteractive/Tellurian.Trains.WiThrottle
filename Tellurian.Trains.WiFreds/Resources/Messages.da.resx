@@ -111,4 +111,7 @@
   <data name="LocoSlot" xml:space="preserve">
     <value>Loko {0}</value>
   </data>
+  <data name="Configure" xml:space="preserve">
+    <value>Konfigurer</value>
+  </data>
 </root>

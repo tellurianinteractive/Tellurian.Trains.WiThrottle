@@ -24,6 +24,12 @@ public sealed class RecordingLocoController : ILoco
         return Task.FromResult(true);
     }
 
+    public Task<LocoInfo?> GetLocoInfoAsync(Address address, CancellationToken cancellationToken = default)
+    {
+        Calls.Add(new LocoCall("GetLocoInfo", address, null, null));
+        return Task.FromResult<LocoInfo?>(null);
+    }
+
     public IEnumerable<LocoCall> DriveCalls => Calls.Where(c => c.Method == "Drive");
     public IEnumerable<LocoCall> EmergencyStopCalls => Calls.Where(c => c.Method == "EmergencyStop");
     public IEnumerable<LocoCall> SetFunctionCalls => Calls.Where(c => c.Method == "SetFunction");
