@@ -1,5 +1,13 @@
 # Release Notes
 
+## Version 1.3.3
+
+### Bug Fixes
+
+- Fixed device name, loco addresses, firmware version, and battery voltage not displaying on the web dashboard. The XML parsing did not match the actual wiFRED firmware XML structure (attribute-based values, `<LOCO>/<DCCadress>` elements).
+- Added debug-level logging of raw XML received from wiFRED devices.
+- Removed firmware version column from dashboard (available via the Configure button).
+
 ## Version 1.3.2
 
 ### Bug Fixes

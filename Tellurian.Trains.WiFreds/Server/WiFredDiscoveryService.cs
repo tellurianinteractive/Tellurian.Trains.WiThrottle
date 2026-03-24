@@ -88,6 +88,8 @@ public sealed class WiFredDiscoveryService(
             var client = httpClientFactory.CreateClient();
             client.Timeout = TimeSpan.FromSeconds(10);
             var xml = await client.GetStringAsync($"http://{device.Address}/api/getConfigXML", cancellationToken);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("Raw XML from wiFRED at {Address}: {Xml}", device.Address, xml);
             xml = NormalizeXmlDeclaration(xml);
             device.Configuration = XDocument.Parse(xml);
 

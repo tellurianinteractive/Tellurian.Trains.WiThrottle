@@ -10,12 +10,13 @@ public class WiFredDeviceTests
     private static XDocument CreateConfigXml(string name, params int[] addresses)
     {
         var locos = new XElement("LOCOS",
-            addresses.Select((a, i) => new XElement($"loco{i}",
-                new XElement("address", a.ToString()))));
+            addresses.Select((a, i) => new XElement("LOCO",
+                new XAttribute("ID", i),
+                new XElement("DCCadress", new XAttribute("value", a.ToString())))));
 
         return new XDocument(
-            new XElement("config",
-                new XElement("throttleName", name),
+            new XElement("wiFred",
+                new XElement("throttleName", new XAttribute("value", name)),
                 locos));
     }
 
@@ -71,8 +72,8 @@ public class WiFredDeviceTests
     {
         var device = new WiFredDevice(IPAddress.Loopback)
         {
-            Configuration = new XDocument(new XElement("config",
-                new XElement("throttleName", "Test")))
+            Configuration = new XDocument(new XElement("wiFred",
+                new XElement("throttleName", new XAttribute("value", "Test"))))
         };
 
         Assert.IsEmpty(device.LocoAddresses);
@@ -83,7 +84,7 @@ public class WiFredDeviceTests
     {
         // wiFRED firmware emits <?XML ...?> (uppercase) which violates the XML spec.
         // NormalizeXmlDeclaration fixes this before parsing.
-        var rawXml = """<?XML version="1.0" encoding="UTF-8"?><config><throttleName>Test</throttleName></config>""";
+        var rawXml = """<?XML version="1.0" encoding="UTF-8"?><wiFred><throttleName value="Test"/></wiFred>""";
         var normalized = System.Text.RegularExpressions.Regex.Replace(rawXml, @"<\?XML\s", "<?xml ", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
         var device = new WiFredDevice(IPAddress.Loopback)
@@ -101,14 +102,15 @@ public class LocoAddressConflictTests
     private static WiFredDevice CreateDevice(string ip, string name, params int[] addresses)
     {
         var locos = new XElement("LOCOS",
-            addresses.Select((a, i) => new XElement($"loco{i}",
-                new XElement("address", a.ToString()))));
+            addresses.Select((a, i) => new XElement("LOCO",
+                new XAttribute("ID", i),
+                new XElement("DCCadress", new XAttribute("value", a.ToString())))));
 
         return new WiFredDevice(IPAddress.Parse(ip))
         {
             Configuration = new XDocument(
-                new XElement("config",
-                    new XElement("throttleName", name),
+                new XElement("wiFred",
+                    new XElement("throttleName", new XAttribute("value", name)),
                     locos))
         };
     }

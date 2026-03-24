@@ -22,7 +22,6 @@ else
             <tr>
                 <th>@Messages.Name</th>
                 <th>@Messages.IPAddress</th>
-                <th>@Messages.Firmware</th>
                 <th>@Messages.Battery</th>
                 @for (var i = 1; i <= WiFredDevice.LocoSlotCount; i++)
                 {
@@ -39,7 +38,6 @@ else
                 <tr>
                     <td>@(device.Name ?? Messages.Unnamed)</td>
                     <td>@device.Address</td>
-                    <td>@(device.FirmwareVersion ?? "-")</td>
                     <td>@(device.BatteryVoltage ?? "-")</td>
                     @foreach (var slot in slots)
                     {

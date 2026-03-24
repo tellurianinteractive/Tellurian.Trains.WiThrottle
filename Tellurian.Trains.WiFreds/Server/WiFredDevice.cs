@@ -13,7 +13,7 @@ public sealed class WiFredDevice(IPAddress address)
     public XDocument? Configuration { get; set; }
 
     public string? Name =>
-        Configuration?.Root?.Element("throttleName")?.Value;
+        XmlValue("throttleName");
 
     public string? FirmwareVersion =>
         XmlValue("firmwareRevision");
@@ -45,7 +45,8 @@ public sealed class WiFredDevice(IPAddress address)
 
     private static int ParseAddress(XElement element)
     {
-        var value = element.Element("address")?.Value;
+        var value = element.Element("DCCadress")?.Attribute("value")?.Value
+            ?? element.Element("address")?.Value;
         return value is not null && int.TryParse(value, out var a) ? a : 0;
     }
 
