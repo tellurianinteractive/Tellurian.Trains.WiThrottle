@@ -1,5 +1,11 @@
 # Release Notes
 
+## Version 1.3.2
+
+### Bug Fixes
+
+- Fixed XML configuration not loading from wiFRED devices. The wiFRED firmware emits an uppercase `<?XML ...?>` declaration which violates the XML spec; the server now normalizes this before parsing.
+
 ## Version 1.3.1
 
 ### WiThrottle Protocol

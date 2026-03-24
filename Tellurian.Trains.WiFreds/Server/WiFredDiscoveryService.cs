@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
 using Tellurian.Trains.WiFreds.Configuration;
@@ -87,6 +88,7 @@ public sealed class WiFredDiscoveryService(
             var client = httpClientFactory.CreateClient();
             client.Timeout = TimeSpan.FromSeconds(10);
             var xml = await client.GetStringAsync($"http://{device.Address}/api/getConfigXML", cancellationToken);
+            xml = NormalizeXmlDeclaration(xml);
             device.Configuration = XDocument.Parse(xml);
 
             if (_logger.IsEnabled(LogLevel.Information))
@@ -142,6 +144,13 @@ public sealed class WiFredDiscoveryService(
             return false;
         }
     }
+
+    /// <summary>
+    /// The wiFRED firmware emits &lt;?XML ...?&gt; (uppercase) which violates the XML spec.
+    /// Replace it with the correct lowercase &lt;?xml ...?&gt; so XDocument.Parse succeeds.
+    /// </summary>
+    private static string NormalizeXmlDeclaration(string xml) =>
+        Regex.Replace(xml, @"<\?XML\s", "<?xml ", RegexOptions.IgnoreCase);
 
     /// <summary>
     /// Sends a UDP message to mark a wiFRED device as inactive.

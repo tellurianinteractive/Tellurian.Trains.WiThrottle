@@ -77,6 +77,22 @@ public class WiFredDeviceTests
 
         Assert.IsEmpty(device.LocoAddresses);
     }
+
+    [TestMethod]
+    public void Configuration_ParsesWithUppercaseXmlDeclaration()
+    {
+        // wiFRED firmware emits <?XML ...?> (uppercase) which violates the XML spec.
+        // NormalizeXmlDeclaration fixes this before parsing.
+        var rawXml = """<?XML version="1.0" encoding="UTF-8"?><config><throttleName>Test</throttleName></config>""";
+        var normalized = System.Text.RegularExpressions.Regex.Replace(rawXml, @"<\?XML\s", "<?xml ", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        var device = new WiFredDevice(IPAddress.Loopback)
+        {
+            Configuration = XDocument.Parse(normalized)
+        };
+
+        Assert.AreEqual("Test", device.Name);
+    }
 }
 
 [TestClass]
