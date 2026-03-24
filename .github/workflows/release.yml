@@ -28,7 +28,7 @@ jobs:
       - name: Publish all platforms
         run: |
           project="Tellurian.Trains.WiFreds/Tellurian.Trains.WiFreds.csproj"
-          common_args="--configuration Release --self-contained true -p:PublishSingleFile=true"
+          common_args="--configuration Release --self-contained true -p:PublishSingleFile=true -p:DebugType=none -p:IsTransformWebConfigDisabled=true"
           dotnet publish "$project" $common_args -r win-x64 -o publish/win-x64
           dotnet publish "$project" $common_args -r linux-arm -o publish/linux-arm
           dotnet publish "$project" $common_args -r linux-arm64 -o publish/linux-arm64
@@ -36,7 +36,7 @@ jobs:
       - name: Bundle documentation and create zips
         run: |
           for rid in win-x64 linux-arm linux-arm64; do
-            rm -f "publish/${rid}/appsettings.Development.json"
+            rm -f "publish/${rid}/appsettings.Development.json" "publish/${rid}"/*.pdb "publish/${rid}/web.config" "publish/${rid}"/*.staticwebassets.endpoints.json
             cp wiFRED.md wiFRED.sv.md "publish/${rid}/"
             cd "publish/${rid}" && zip -r "../wifred-server-${rid}.zip" . && cd ../..
           done
