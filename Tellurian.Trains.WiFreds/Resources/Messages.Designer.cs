@@ -137,4 +137,9 @@ internal static partial class Messages
     ///   Looks up a localized string similar to Configure.
     /// </summary>
     internal static string Configure => ResourceManager.GetString("Configure", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Refresh.
+    /// </summary>
+    internal static string Refresh => ResourceManager.GetString("Refresh", Culture)!;
 }

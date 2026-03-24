@@ -7,6 +7,8 @@
 - Fixed device name, loco addresses, firmware version, and battery voltage not displaying on the web dashboard. The XML parsing did not match the actual wiFRED firmware XML structure (attribute-based values, `<LOCO>/<DCCadress>` elements).
 - Added debug-level logging of raw XML received from wiFRED devices.
 - Removed firmware version column from dashboard (available via the Configure button).
+- Fixed inline loco address update: addresses above 127 now correctly set DCC long addressing mode on the wiFRED.
+- Added Refresh button per device to re-fetch configuration from the wiFRED.
 
 ## Version 1.3.2
 

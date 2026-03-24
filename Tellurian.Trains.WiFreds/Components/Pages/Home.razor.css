@@ -119,3 +119,19 @@ h2, h3 {
     background: #3a7aba;
     color: #fff;
 }
+
+.refresh-btn {
+    padding: 4px 12px;
+    background: #555;
+    color: #eee;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    margin-left: 6px;
+}
+
+.refresh-btn:hover {
+    background: #777;
+    color: #fff;
+}

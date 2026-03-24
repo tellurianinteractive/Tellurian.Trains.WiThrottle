@@ -104,6 +104,12 @@ public sealed class WiFredDiscoveryService(
         }
     }
 
+    public async Task RefreshConfigurationAsync(IPAddress deviceAddress)
+    {
+        if (_devices.TryGetValue(deviceAddress, out var device))
+            await FetchConfigurationAsync(device, CancellationToken.None);
+    }
+
     public IReadOnlyList<WiFredDevice> GetDiscoveredDevices()
     {
         return _devices.Values
@@ -131,7 +137,10 @@ public sealed class WiFredDiscoveryService(
         {
             var client = httpClientFactory.CreateClient();
             client.Timeout = TimeSpan.FromSeconds(10);
-            await client.GetStringAsync($"http://{deviceAddress}/?loco={slot}&loco.address={newAddress}");
+            var url = $"http://{deviceAddress}/?loco={slot}&loco.address={newAddress}";
+            if (newAddress > 127)
+                url += "&loco.longAddress=1";
+            await client.GetStringAsync(url);
             await FetchConfigurationAsync(device, CancellationToken.None);
 
             if (_logger.IsEnabled(LogLevel.Information))

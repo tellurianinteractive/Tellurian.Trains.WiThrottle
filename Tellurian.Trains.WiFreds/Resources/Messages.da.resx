@@ -114,4 +114,7 @@
   <data name="Configure" xml:space="preserve">
     <value>Konfigurer</value>
   </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Opdater</value>
+  </data>
 </root>

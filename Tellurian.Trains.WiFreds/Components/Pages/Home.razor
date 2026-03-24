@@ -62,7 +62,10 @@ else
                         </td>
                     }
                     <td>@device.LastSeen.LocalDateTime.ToString("HH:mm:ss")</td>
-                    <td><a class="configure-btn" href="http://@device.Address/" target="_blank">@Messages.Configure</a></td>
+                    <td>
+                        <a class="configure-btn" href="http://@device.Address/" target="_blank">@Messages.Configure</a>
+                        <button class="refresh-btn" @onclick="() => RefreshDevice(device)">@Messages.Refresh</button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -139,6 +142,12 @@ else
     {
         await DiscoveryService.UpdateLocoAddressAsync(device.Address, slot, _editAddress);
         CancelEdit();
+        RefreshData();
+    }
+
+    private async Task RefreshDevice(WiFredDevice device)
+    {
+        await DiscoveryService.RefreshConfigurationAsync(device.Address);
         RefreshData();
     }
 
