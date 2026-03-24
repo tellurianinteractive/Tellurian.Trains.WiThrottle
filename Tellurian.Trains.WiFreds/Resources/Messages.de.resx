@@ -117,4 +117,19 @@
   <data name="Refresh" xml:space="preserve">
     <value>Aktualisieren</value>
   </data>
+  <data name="ConfigureWarningTitle" xml:space="preserve">
+    <value>Warnung</value>
+  </data>
+  <data name="ConfigureWarningMessage" xml:space="preserve">
+    <value>Das Öffnen der wiFRED-Konfigurationsseite während Züge fahren kann zu Heartbeat-Timeouts und Notbremsungen führen. Stoppen Sie alle von diesem wiFRED gesteuerten Züge, bevor Sie fortfahren.</value>
+  </data>
+  <data name="ConfigureWarningCloseReminder" xml:space="preserve">
+    <value>Denken Sie daran, die Konfigurationsseite zu schließen, bevor Sie den Fahrbetrieb wieder aufnehmen.</value>
+  </data>
+  <data name="GoToConfigurationPage" xml:space="preserve">
+    <value>Zur Konfigurationsseite</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
 </root>

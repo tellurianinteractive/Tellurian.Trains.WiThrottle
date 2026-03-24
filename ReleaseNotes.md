@@ -1,5 +1,16 @@
 # Release Notes
 
+## Version 1.3.5
+
+### Web Dashboard
+
+- Battery level now shown as percentage (0–100%) using a realistic LiPo discharge curve, instead of a raw millivolt value. Low battery is highlighted in red.
+- Configure button now shows a warning dialog before opening the wiFRED's configuration page, explaining that it may cause heartbeat timeouts and emergency stops while trains are running.
+
+### Localization
+
+- Added new resource strings for the configure warning dialog and cancel button in all languages (en, sv, de, da, nb).
+
 ## Version 1.3.4
 
 ### Bug Fixes

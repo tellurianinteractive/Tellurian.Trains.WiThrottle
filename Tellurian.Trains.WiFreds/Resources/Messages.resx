@@ -117,4 +117,19 @@
   <data name="Refresh" xml:space="preserve">
     <value>Refresh</value>
   </data>
+  <data name="ConfigureWarningTitle" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="ConfigureWarningMessage" xml:space="preserve">
+    <value>Opening the wiFRED configuration page while trains are running may cause heartbeat timeouts and emergency stops. Stop all trains controlled by this wiFRED before continuing.</value>
+  </data>
+  <data name="ConfigureWarningCloseReminder" xml:space="preserve">
+    <value>Remember to close the configuration page before resuming driving.</value>
+  </data>
+  <data name="GoToConfigurationPage" xml:space="preserve">
+    <value>Go to configuration page</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
 </root>

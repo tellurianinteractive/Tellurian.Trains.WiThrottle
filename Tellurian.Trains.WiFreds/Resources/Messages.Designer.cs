@@ -142,4 +142,29 @@ internal static partial class Messages
     ///   Looks up a localized string similar to Refresh.
     /// </summary>
     internal static string Refresh => ResourceManager.GetString("Refresh", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Warning.
+    /// </summary>
+    internal static string ConfigureWarningTitle => ResourceManager.GetString("ConfigureWarningTitle", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Opening the wiFRED configuration page while trains are running may cause heartbeat timeouts and emergency stops....
+    /// </summary>
+    internal static string ConfigureWarningMessage => ResourceManager.GetString("ConfigureWarningMessage", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Remember to close the configuration page before resuming driving..
+    /// </summary>
+    internal static string ConfigureWarningCloseReminder => ResourceManager.GetString("ConfigureWarningCloseReminder", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Go to configuration page.
+    /// </summary>
+    internal static string GoToConfigurationPage => ResourceManager.GetString("GoToConfigurationPage", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Cancel.
+    /// </summary>
+    internal static string Cancel => ResourceManager.GetString("Cancel", Culture)!;
 }

@@ -38,7 +38,16 @@ else
                 <tr>
                     <td>@(device.Name ?? Messages.Unnamed)</td>
                     <td>@device.Address</td>
-                    <td>@(device.BatteryVoltage ?? "-")</td>
+                    <td class="@(device.IsBatteryLow ? "battery-low" : "")">
+                        @if (device.BatteryPercent is { } pct)
+                        {
+                            @($"{pct}%")
+                        }
+                        else
+                        {
+                            <text>-</text>
+                        }
+                    </td>
                     @foreach (var slot in slots)
                     {
                         var statusClass = slot.Address > 0
@@ -63,7 +72,7 @@ else
                     }
                     <td>@device.LastSeen.LocalDateTime.ToString("HH:mm:ss")</td>
                     <td>
-                        <a class="configure-btn" href="http://@device.Address/" target="_blank">@Messages.Configure</a>
+                        <button class="configure-btn" @onclick="() => ShowConfigureWarning(device)">@Messages.Configure</button>
                         <button class="refresh-btn" @onclick="() => RefreshDevice(device)">@Messages.Refresh</button>
                     </td>
                 </tr>
@@ -95,6 +104,22 @@ else
         </tbody>
     </table>
 }
+@if (_configureWarningDevice is not null)
+{
+    <div class="modal-overlay" @onclick="CloseConfigureWarning">
+        <div class="modal-dialog" @onclick:stopPropagation="true">
+            <h3>@Messages.ConfigureWarningTitle</h3>
+            <p>@Messages.ConfigureWarningMessage</p>
+            <p>@Messages.ConfigureWarningCloseReminder</p>
+            <div class="modal-buttons">
+                <a class="configure-btn" href="http://@_configureWarningDevice.Address/" target="_blank"
+                   @onclick="CloseConfigureWarning">@Messages.GoToConfigurationPage</a>
+                <button class="cancel-modal-btn" @onclick="CloseConfigureWarning">@Messages.Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private IReadOnlyList<WiFredDevice> _devices = [];
     private IReadOnlyList<LocoAddressConflict> _conflicts = [];
@@ -104,6 +129,8 @@ else
     private WiFredDevice? _editingDevice;
     private int _editingSlot;
     private int _editAddress;
+
+    private WiFredDevice? _configureWarningDevice;
 
     protected override void OnInitialized()
     {
@@ -150,6 +177,12 @@ else
         await DiscoveryService.RefreshConfigurationAsync(device.Address);
         RefreshData();
     }
+
+    private void ShowConfigureWarning(WiFredDevice device) =>
+        _configureWarningDevice = device;
+
+    private void CloseConfigureWarning() =>
+        _configureWarningDevice = null;
 
     public void Dispose()
     {

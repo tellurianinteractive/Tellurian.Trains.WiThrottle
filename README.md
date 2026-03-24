@@ -141,8 +141,8 @@ You find releases under [Releases](https://github.com/tellurianinteractive/Tellu
 
 Install and run for the first time
 
-1. Download **linux-arm.zip** for 32-bit or **linux-arm64.zip** for 64-bit
-2. unzip ***version*.zip** -d wifredserver
+1. Download **wifred-server-linux-arm.zip** for 32-bit or **wifred-server-linux-arm64.zip** for 64-bit
+2. unzip **wifred-server-*.zip** -d wifredserver
 3. cd wifredserver
 4. configure control station to use in **appsettings.json**
 5. chmod +x Tellurian.Trains.WiFreds
@@ -155,8 +155,8 @@ This is operating system specific and not covered here.
 
 Install and run for the first time
 
-1. Download **win-x64.zip**.
-2. unzip **win-x64.zip** -d wifredserver
+1. Download **wifred-server-win-x64.zip**.
+2. unzip **wifred-server-win-x64.zip** -d wifredserver
 3. cd wifredserver
 4. configure control station to use in **appsettings.json**
 5. ./Tellurian.Trains.WiFreds  **<- this starts the app, only thing needed when running later**
@@ -169,10 +169,10 @@ This is operating system specific and not covered here.
 The server includes a built-in web dashboard that shows all currently connected wiFRED devices.
 The page auto-refreshes every 5 seconds and displays:
 
-- Device name, IP address, firmware version, and battery voltage
+- Device name, IP address, and battery level as percentage (with low-battery warning)
 - All 4 loco address slots as individual columns, color-coded: green for addresses actively controlled by a wiFRED session, red for idle addresses
 - Last seen timestamp
-- Configure button to open the wiFRED's own configuration web page
+- Configure button with a safety warning before opening the wiFRED's configuration page (opening it while trains are running may interfere with heartbeats)
 - Loco address conflicts (when multiple wiFREDs control the same loco)
 
 Loco addresses can be edited inline: click an address value to open an edit field,

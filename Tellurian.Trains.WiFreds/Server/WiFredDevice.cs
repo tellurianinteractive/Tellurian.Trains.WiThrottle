@@ -21,6 +21,67 @@ public sealed class WiFredDevice(IPAddress address)
     public string? BatteryVoltage =>
         XmlValue("batteryVoltage");
 
+    /// <summary>
+    /// Battery level as percentage (0–100), based on a typical single-cell LiPo discharge curve.
+    /// Returns null if battery voltage is not available.
+    /// </summary>
+    public int? BatteryPercent
+    {
+        get
+        {
+            var raw = BatteryVoltage;
+            if (raw is null || !int.TryParse(raw, out var mV)) return null;
+            return LiPoPercentage(mV);
+        }
+    }
+
+    /// <summary>
+    /// Typical single-cell LiPo discharge curve: mV → percentage.
+    /// Uses linear interpolation between reference points.
+    /// </summary>
+    internal static int LiPoPercentage(int milliVolts)
+    {
+        ReadOnlySpan<(int mV, int pct)> curve =
+        [
+            (4200, 100),
+            (4150,  95),
+            (4110,  90),
+            (4080,  85),
+            (4020,  80),
+            (3980,  75),
+            (3950,  70),
+            (3910,  65),
+            (3870,  60),
+            (3830,  55),
+            (3790,  50),
+            (3750,  45),
+            (3710,  40),
+            (3670,  35),
+            (3630,  30),
+            (3590,  25),
+            (3570,  20),
+            (3530,  15),
+            (3490,  10),
+            (3450,   5),
+            (3300,   0),
+        ];
+
+        if (milliVolts >= curve[0].mV) return 100;
+        if (milliVolts <= curve[^1].mV) return 0;
+
+        for (var i = 0; i < curve.Length - 1; i++)
+        {
+            var (highMv, highPct) = curve[i];
+            var (lowMv, lowPct) = curve[i + 1];
+            if (milliVolts >= lowMv)
+                return lowPct + (highPct - lowPct) * (milliVolts - lowMv) / (highMv - lowMv);
+        }
+        return 0;
+    }
+
+    public bool IsBatteryLow =>
+        XmlValue("batteryLow") == "1";
+
     public IReadOnlyList<LocoSlot> LocoSlots
     {
         get

@@ -117,4 +117,19 @@
   <data name="Refresh" xml:space="preserve">
     <value>Uppdatera</value>
   </data>
+  <data name="ConfigureWarningTitle" xml:space="preserve">
+    <value>Varning</value>
+  </data>
+  <data name="ConfigureWarningMessage" xml:space="preserve">
+    <value>Att öppna wiFREDs konfigurationssida medan tåg körs kan orsaka heartbeat-timeout och nödstopp. Stoppa alla tåg som styrs av denna wiFRED innan du fortsätter.</value>
+  </data>
+  <data name="ConfigureWarningCloseReminder" xml:space="preserve">
+    <value>Kom ihåg att stänga konfigurationssidan innan du återupptar körningen.</value>
+  </data>
+  <data name="GoToConfigurationPage" xml:space="preserve">
+    <value>Gå till konfigurationssidan</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Avbryt</value>
+  </data>
 </root>

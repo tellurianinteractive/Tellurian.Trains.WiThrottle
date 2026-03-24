@@ -38,7 +38,7 @@ jobs:
           for rid in win-x64 linux-arm linux-arm64; do
             rm -f "publish/${rid}/appsettings.Development.json"
             cp wiFRED.md wiFRED.sv.md "publish/${rid}/"
-            cd "publish/${rid}" && zip -r "../${rid}.zip" . && cd ../..
+            cd "publish/${rid}" && zip -r "../wifred-server-${rid}.zip" . && cd ../..
           done
 
       - name: Create GitHub release
@@ -46,8 +46,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
-            publish/win-x64.zip \
-            publish/linux-arm.zip \
-            publish/linux-arm64.zip \
+            publish/wifred-server-win-x64.zip \
+            publish/wifred-server-linux-arm.zip \
+            publish/wifred-server-linux-arm64.zip \
             --title "$GITHUB_REF_NAME" \
             --generate-notes

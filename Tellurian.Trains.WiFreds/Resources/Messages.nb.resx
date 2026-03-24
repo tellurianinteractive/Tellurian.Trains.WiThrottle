@@ -117,4 +117,19 @@
   <data name="Refresh" xml:space="preserve">
     <value>Oppdater</value>
   </data>
+  <data name="ConfigureWarningTitle" xml:space="preserve">
+    <value>Advarsel</value>
+  </data>
+  <data name="ConfigureWarningMessage" xml:space="preserve">
+    <value>Å åpne wiFRED-konfigurasjonssiden mens tog kjører kan forårsake heartbeat-timeout og nødstopp. Stopp alle tog styrt av denne wiFRED før du fortsetter.</value>
+  </data>
+  <data name="ConfigureWarningCloseReminder" xml:space="preserve">
+    <value>Husk å lukke konfigurasjonssiden før du gjenopptar kjøringen.</value>
+  </data>
+  <data name="GoToConfigurationPage" xml:space="preserve">
+    <value>Gå til konfigurasjonssiden</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Avbryt</value>
+  </data>
 </root>
