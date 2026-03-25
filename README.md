@@ -261,6 +261,17 @@ and connect locally:
 Install the app for your Raspberry Pi OS (`linux-arm` for 32-bit, `linux-arm64` for 64-bit),
 copy it to the PiLocoBuffer, and run it alongside the LbServer.
 
+## wiFRED WiFi Configuration
+
+The wiFRED firmware supports multiple configured WiFi networks, but only **one should be enabled at a time**.
+The firmware caches the WiThrottle server address after the first successful mDNS discovery,
+and this cache is not cleared when switching between networks. Having multiple networks enabled
+can cause the wiFRED to connect to WiFi successfully but fail to reach the WiThrottle server,
+because it tries to use a cached server address from a different network.
+
+**Recommendation:** On the wiFRED's configuration page, disable any WiFi networks
+you are not currently using. Enable only the network where your wiFRED Server is running.
+
 ## Known Limitations
 
 - LocoNet adapter (Serial, TCP, and UDP) supports functions F0-F12 only; F13-F28 require Z21.
