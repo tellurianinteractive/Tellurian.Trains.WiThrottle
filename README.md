@@ -266,3 +266,54 @@ copy it to the PiLocoBuffer, and run it alongside the LbServer.
 - LocoNet adapter (Serial, TCP, and UDP) supports functions F0-F12 only; F13-F28 require Z21.
 - WiFred functions F0-F16; functions beyond F16 are protocol-supported but not used by WiFred.
 - The server implements only the WiFred-required subset of the WiThrottle protocol.
+
+## USB-to-Serial on Linux
+
+USB-to-serial adapters (used by LocoBuffer-USB, RR-CirKits LocoBuffer-NG, etc.) appear as
+`/dev/ttyUSB0`, `/dev/ttyUSB1`, etc. The number is assigned in plug-in order and can change between reboots.
+
+### Stable device paths
+
+For a stable name that survives reboots, use the symlinks under `/dev/serial/by-id/`:
+
+```bash
+ls -la /dev/serial/by-id/
+```
+
+This gives paths like `usb-FTDI_FT232R_USB_UART_A12345-if00-port0` based on the adapter's chip and serial number.
+Use the full path in `appsettings.json`:
+
+```json
+{
+  "CommandStation": {
+    "Type": "Serial",
+    "SerialPort": {
+      "PortName": "/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A12345-if00-port0",
+      "BaudRate": 57600
+    }
+  }
+}
+```
+
+### Permissions
+
+The serial device is owned by the `dialout` group. The user running the server needs membership:
+
+```bash
+sudo usermod -aG dialout $USER
+```
+
+Log out and back in (or reboot) for the change to take effect.
+
+### Drivers
+
+Most LocoNet adapters use FTDI, CH340, or CP2102 chips. The drivers for these are included
+in the default Raspberry Pi OS kernel — no extra installation needed.
+
+### Troubleshooting
+
+```bash
+ls -la /dev/ttyUSB*          # check if the device appeared
+ls -la /dev/serial/by-id/    # find the stable device name
+dmesg | tail                  # kernel messages about the USB device
+```
