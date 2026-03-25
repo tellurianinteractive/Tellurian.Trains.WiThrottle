@@ -102,6 +102,9 @@ public sealed class WiFredTcpServer : BackgroundService
 
                     if (line is null) break; // Client disconnected
 
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                        _logger.LogDebug("Received from {ClientId}: {Line}", clientId, line);
+
                     var message = WiFredParser.Parse(line);
                     var response = await handler.HandleAsync(message, stoppingToken);
 

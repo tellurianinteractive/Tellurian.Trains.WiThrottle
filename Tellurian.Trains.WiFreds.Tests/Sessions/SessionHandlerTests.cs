@@ -27,7 +27,7 @@ public class SessionHandlerTests
             settings,
             NullLogger<ThrottledLocoController>.Instance);
         var session = new ThrottleSession();
-        var tracker = new ActiveLocoTracker();
+        var tracker = new ActiveLocoTracker(NullLogger<ActiveLocoTracker>.Instance);
         var handler = new SessionHandler(session, controller, tracker, "test-session", NullLogger.Instance);
         return (handler, recorder);
     }

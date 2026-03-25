@@ -47,7 +47,7 @@ public class SimulatedWiFredTests
         var server = new WiFredTcpServer(
             serverSettings,
             controller,
-            new ActiveLocoTracker(),
+            new ActiveLocoTracker(NullLogger<ActiveLocoTracker>.Instance),
             NullLoggerFactory.Instance,
             NullLogger<WiFredTcpServer>.Instance);
 
@@ -154,7 +154,7 @@ public class SimulatedWiFredTests
         var server = new WiFredTcpServer(
             serverSettings,
             controller,
-            new ActiveLocoTracker(),
+            new ActiveLocoTracker(NullLogger<ActiveLocoTracker>.Instance),
             NullLoggerFactory.Instance,
             NullLogger<WiFredTcpServer>.Instance);
 
