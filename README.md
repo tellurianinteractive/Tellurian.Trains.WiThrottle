@@ -42,102 +42,49 @@ Pick **one** of the following:
 
 ## Getting Started
 
-Settings are in the `appsettings.json` file in the programs folder. You can have all different protocols defined in the file. The one used is the one given for the command station type.
+### Supported Platforms
 
-### Running with Serial Communication
+Published as self-contained single-file executables for:
 
-Set the command station type to `Serial` and configure the serial port. The baud rate is the standard value used:
+- **Windows x64** (`win-x64`)
+- **Linux ARM** (`linux-arm`) — e.g. Raspberry Pi (32-bit)
+- **Linux ARM64** (`linux-arm64`) — e.g. Raspberry Pi (64-bit)
 
-```json
-{
-  "CommandStation": {
-    "Type": "Serial",
-    "SerialPort": {
-      "PortName": "COM3",
-      "BaudRate": 57600
-    }
-  }
-}
-```
+### System Requirements
 
-### Running with ROCO Z21
+#### Server (runs the wiFRED Server application)
 
-Set the command station type to `Z21` and configure the Z21 network address. The command and feedback port numbers are standard for Z21:
+The app is built on .NET 10 and published as a self-contained executable, so no separate .NET installation is needed. However, the operating system must meet .NET 10's minimum requirements:
 
-```json
-{
-  "CommandStation": {
-    "Type": "Z21",
-    "Z21": {
-      "Address": "192.168.0.111",
-      "CommandPort": 21105,
-      "FeedbackPort": 21106
-    }
-  }
-}
-```
+| OS | Minimum Version |
+|----|-----------------|
+| Windows (x64) | Windows 10 or Windows Server 2012 R2 |
+| Linux ARM/ARM64 | Raspberry Pi OS 11 (Bullseye) or later, Ubuntu 22.04+, Debian 11+ |
+| macOS | macOS 15 "Sequoia" or later (no pre-built binary; build from source) |
 
-### Running with LocoNet over TCP
+Windows 7 and Windows 8.1 are **not supported** by .NET 10.
 
-Connect to a LoconetOverTcp server (e.g. Rocrail or LbServer):
+A detailed .NET 10 OS support list can be found [here](https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md).
 
-```json
-{
-  "CommandStation": {
-    "Type": "LocoNetTcp",
-    "LocoNetTcp": {
-      "Hostname": "localhost",
-      "Port": 1234
-    }
-  }
-}
-```
+#### Web Dashboard (browser)
 
-### Running with LocoNet over UDP Multicast
+The web dashboard uses Blazor Server with SignalR over WebSockets.
+Any device on the network can access it — it does not need to run on the same machine as the server.
 
-Connect via a UDP multicast gateway (e.g. loconetd or GCA101 LocoBuffer-UDP):
+| Browser | Minimum Version |
+|---------|-----------------|
+| Google Chrome | Current version |
+| Microsoft Edge | Current version |
+| Mozilla Firefox | Current version |
+| Apple Safari | Current version |
 
-```json
-{
-  "CommandStation": {
-    "Type": "LocoNetUdp",
-    "LocoNetUdp": {
-      "MulticastGroup": "224.0.0.1",
-      "ListenPort": 1235,
-      "SendAddress": "224.0.0.1",
-      "SendPort": 1235,
-      "ValidateChecksum": true
-    }
-  }
-}
-```
+Internet Explorer is **not supported**. Microsoft dropped Blazor support for IE starting with ASP.NET Core 5.0.
 
-### Running on a FREMO PiLocoBuffer
-
-The [PiLocoBuffer](https://wiki.fremo-net.eu/doku.php?id=loconet:lbserver:pilocobuffer_active) is a Raspberry Pi with a LocoNet hat board and a built-in LbServer.
-Since LbServer provides LocoNet over TCP, this app can run on the same Raspberry Pi
-and connect locally:
-
-```json
-{
-  "CommandStation": {
-    "Type": "LocoNetTcp",
-    "LocoNetTcp": {
-      "Hostname": "127.0.0.1",
-      "Port": 1234
-    }
-  }
-}
-```
-
-Install the app for your Raspberry Pi OS (`linux-arm` for 32-bit, `linux-arm64` for 64-bit),
-copy it to the PiLocoBuffer, and run it alongside the LbServer.
-
-## Installing and Running
+### Installing and Running
 
 You find releases under [Releases](https://github.com/tellurianinteractive/Tellurian.Trains.WiThrottle/releases) on the repository's root page.
 
-### Linux
+#### Linux
 
 Install and run for the first time
 
@@ -151,7 +98,7 @@ Install and run for the first time
 You may also consider to use autostart of the wiFRED Server.
 This is operating system specific and not covered here.
 
-### Windows
+#### Windows
 
 Install and run for the first time
 
@@ -221,43 +168,98 @@ All settings are in `appsettings.json`:
 Settings can also be overridden via environment variables or command-line arguments
 using standard .NET configuration (e.g. `WiFred__Port=12345`).
 
-## Supported Platforms
+### Configuration Examples
 
-Published as self-contained single-file executables for:
+Settings are in the `appsettings.json` file in the programs folder. You can have all different protocols defined in the file. The one used is the one given for the command station type.
 
-- **Windows x64** (`win-x64`)
-- **Linux ARM** (`linux-arm`) — e.g. Raspberry Pi (32-bit)
-- **Linux ARM64** (`linux-arm64`) — e.g. Raspberry Pi (64-bit)
+#### Running with Serial Communication
 
-## System Requirements
+Set the command station type to `Serial` and configure the serial port. The baud rate is the standard value used:
 
-### Server (runs the wiFRED Server application)
+```json
+{
+  "CommandStation": {
+    "Type": "Serial",
+    "SerialPort": {
+      "PortName": "COM3",
+      "BaudRate": 57600
+    }
+  }
+}
+```
 
-The app is built on .NET 10 and published as a self-contained executable, so no separate .NET installation is needed. However, the operating system must meet .NET 10's minimum requirements:
+#### Running with ROCO Z21
 
-| OS | Minimum Version |
-|----|-----------------|
-| Windows (x64) | Windows 10 or Windows Server 2012 R2 |
-| Linux ARM/ARM64 | Raspberry Pi OS 11 (Bullseye) or later, Ubuntu 22.04+, Debian 11+ |
-| macOS | macOS 15 "Sequoia" or later (no pre-built binary; build from source) |
+Set the command station type to `Z21` and configure the Z21 network address. The command and feedback port numbers are standard for Z21:
 
-Windows 7 and Windows 8.1 are **not supported** by .NET 10.
+```json
+{
+  "CommandStation": {
+    "Type": "Z21",
+    "Z21": {
+      "Address": "192.168.0.111",
+      "CommandPort": 21105,
+      "FeedbackPort": 21106
+    }
+  }
+}
+```
 
-A detailed .NET 10 OS support list can be found [here](https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md).
+#### Running with LocoNet over TCP
 
-### Web Dashboard (browser)
+Connect to a LoconetOverTcp server (e.g. Rocrail or LbServer):
 
-The web dashboard uses Blazor Server with SignalR over WebSockets.
-Any device on the network can access it — it does not need to run on the same machine as the server.
+```json
+{
+  "CommandStation": {
+    "Type": "LocoNetTcp",
+    "LocoNetTcp": {
+      "Hostname": "localhost",
+      "Port": 1234
+    }
+  }
+}
+```
 
-| Browser | Minimum Version |
-|---------|-----------------|
-| Google Chrome | Current version |
-| Microsoft Edge | Current version |
-| Mozilla Firefox | Current version |
-| Apple Safari | Current version |
+#### Running with LocoNet over UDP Multicast
 
-Internet Explorer is **not supported**. Microsoft dropped Blazor support for IE starting with ASP.NET Core 5.0.
+Connect via a UDP multicast gateway (e.g. loconetd or GCA101 LocoBuffer-UDP):
+
+```json
+{
+  "CommandStation": {
+    "Type": "LocoNetUdp",
+    "LocoNetUdp": {
+      "MulticastGroup": "224.0.0.1",
+      "ListenPort": 1235,
+      "SendAddress": "224.0.0.1",
+      "SendPort": 1235,
+      "ValidateChecksum": true
+    }
+  }
+}
+```
+
+#### Running on a FREMO PiLocoBuffer
+
+The [PiLocoBuffer](https://wiki.fremo-net.eu/doku.php?id=loconet:lbserver:pilocobuffer_active) is a Raspberry Pi with a LocoNet hat board and a built-in LbServer.
+Since LbServer provides LocoNet over TCP, this app can run on the same Raspberry Pi
+and connect locally:
+
+```json
+{
+  "CommandStation": {
+    "Type": "LocoNetTcp",
+    "LocoNetTcp": {
+      "Hostname": "127.0.0.1",
+      "Port": 1234
+    }
+  }
+}
+```
+
+Install the app for your Raspberry Pi OS (`linux-arm` for 32-bit, `linux-arm64` for 64-bit),
+copy it to the PiLocoBuffer, and run it alongside the LbServer.
 
 ## Known Limitations
 

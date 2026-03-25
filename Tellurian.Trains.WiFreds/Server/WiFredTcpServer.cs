@@ -126,10 +126,10 @@ public sealed class WiFredTcpServer : BackgroundService
         }
         finally
         {
-            // Cleanup: e-stop all locos on disconnect
+            // Cleanup: e-stop all locos and release from tracker on disconnect
             try
             {
-                await handler.EmergencyStopAllAsync(CancellationToken.None);
+                await handler.EmergencyStopAndReleaseAllAsync(CancellationToken.None);
             }
             catch (Exception ex)
             {

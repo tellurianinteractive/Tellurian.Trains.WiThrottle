@@ -1,5 +1,19 @@
 # Release Notes
 
+## Version 1.3.6
+
+### Bug Fixes
+
+- Fixed heartbeat timeout releasing loco addresses from the dashboard tracker, causing addresses to permanently show as red (inactive) even though the session was still alive and commands were being sent. This was most visible when using LocoNet via serial port, where slot requests can take up to 3 seconds each, blocking the TCP read loop long enough to trigger the heartbeat timeout.
+
+### Build
+
+- Fixed release workflow to keep `staticwebassets.endpoints.json` in published zips, as the server requires it at runtime.
+
+### Documentation
+
+- Reorganized README sections for better readability.
+
 ## Version 1.3.5
 
 ### Web Dashboard

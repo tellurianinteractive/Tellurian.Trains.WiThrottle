@@ -232,7 +232,8 @@ public sealed class SessionHandler
     }
 
     /// <summary>
-    /// Emergency stops all acquired locos and releases them. Called on quit or disconnect.
+    /// Emergency stops all acquired locos without releasing them from the tracker.
+    /// Called on heartbeat timeout where the session is still alive.
     /// </summary>
     public async Task EmergencyStopAllAsync(CancellationToken cancellationToken = default)
     {
@@ -242,12 +243,21 @@ public sealed class SessionHandler
             await _controller.EmergencyStopAsync(loco.Address, cancellationToken);
             _controller.RemoveSpeedThrottler(loco.Address.Number);
         }
+    }
+
+    /// <summary>
+    /// Emergency stops all acquired locos and releases them from the tracker.
+    /// Called on quit or disconnect when the session is ending.
+    /// </summary>
+    public async Task EmergencyStopAndReleaseAllAsync(CancellationToken cancellationToken = default)
+    {
+        await EmergencyStopAllAsync(cancellationToken);
         _tracker.ReleaseAll(_sessionId);
     }
 
     private async Task<string?> HandleQuitAsync(CancellationToken cancellationToken)
     {
-        await EmergencyStopAllAsync(cancellationToken);
+        await EmergencyStopAndReleaseAllAsync(cancellationToken);
         if (_logger.IsEnabled(LogLevel.Information))
             _logger.LogInformation("Client {Name} quit", _session.Name);
         return null;
