@@ -132,4 +132,7 @@
   <data name="Cancel" xml:space="preserve">
     <value>Avbryt</value>
   </data>
+  <data name="InactiveAddressHint" xml:space="preserve">
+    <value>Klikk på en rød lokoadresse for å endre den.</value>
+  </data>
 </root>

@@ -1,5 +1,32 @@
 # Release Notes
 
+## Version 1.3.7
+
+### Web Dashboard
+
+- Loco address editing is now restricted to inactive (red) addresses only. Active (green) addresses cannot be changed while in use.
+- Added a hint below the page header explaining that red addresses can be clicked to change them.
+- Automatic periodic refresh of wiFRED device configuration (default every 5 minutes per device), keeping battery level and loco addresses up to date without manual intervention.
+
+### wiFRED WiFi Workaround
+
+- Automatic fix for a suspected wiFRED firmware bug where the device caches the WiThrottle server address from a previously connected WiFi network, causing it to fail to connect when moving to a different network. When the server detects a wiFRED with multiple enabled WiFi networks, it temporarily disables the extra networks and restarts the device to force a fresh mDNS server discovery, then re-enables all networks so they remain available for the next location change.
+
+### Command Station Connection
+
+- Graceful handling of command station disconnection (e.g. USB adapter unplugged). The server retries twice and then shuts down cleanly instead of crashing with a stack trace.
+
+### Diagnostics
+
+- Added logging to the active loco address tracker for easier troubleshooting of address state changes.
+- Added debug-level logging of incoming WiThrottle protocol messages.
+
+### Documentation
+
+- Added [Getting Started Guide](docs/getting-started.md) with plain-language setup instructions, connection diagrams, and troubleshooting — aimed at users who are not technically experienced.
+- Streamlined the README to focus on technical reference, linking to the Getting Started Guide for installation steps.
+- Added USB-to-Serial on Linux section to README (stable device paths, permissions, drivers, troubleshooting).
+
 ## Version 1.3.6
 
 ### Bug Fixes

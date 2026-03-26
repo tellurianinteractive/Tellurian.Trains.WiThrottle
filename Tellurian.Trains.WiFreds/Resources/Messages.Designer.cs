@@ -167,4 +167,9 @@ internal static partial class Messages
     ///   Looks up a localized string similar to Cancel.
     /// </summary>
     internal static string Cancel => ResourceManager.GetString("Cancel", Culture)!;
+
+    /// <summary>
+    ///   Looks up a localized string similar to Click a red loco address to change it..
+    /// </summary>
+    internal static string InactiveAddressHint => ResourceManager.GetString("InactiveAddressHint", Culture)!;
 }

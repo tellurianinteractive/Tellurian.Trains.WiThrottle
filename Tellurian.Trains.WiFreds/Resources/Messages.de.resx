@@ -132,4 +132,7 @@
   <data name="Cancel" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="InactiveAddressHint" xml:space="preserve">
+    <value>Klicken Sie auf eine rote Lokadresse, um sie zu ändern.</value>
+  </data>
 </root>

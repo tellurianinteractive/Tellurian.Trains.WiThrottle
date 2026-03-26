@@ -104,6 +104,37 @@ public sealed class WiFredDevice(IPAddress address)
     public IReadOnlyList<int> LocoAddresses =>
         LocoSlots.Where(s => s.Address > 0).Select(s => s.Address).ToList();
 
+    public string? ConnectedSsid =>
+        Configuration?.Root?.Element("WiFi")?.Element("SSID")?.Attribute("value")?.Value;
+
+    public IReadOnlyList<WiFredNetwork> ConfiguredNetworks
+    {
+        get
+        {
+            var networks = Configuration?.Root?.Element("NETWORKS");
+            if (networks is null) return [];
+
+            return networks.Elements("NETWORK").Select(n =>
+            {
+                var ssid = n.Element("SSID")?.Attribute("value")?.Value ?? "";
+                var enabled = n.Element("Enabled")?.Attribute("value")?.Value == "1";
+                return new WiFredNetwork(ssid, enabled);
+            }).ToList();
+        }
+    }
+
+    public IReadOnlyList<WiFredNetwork> ExtraEnabledNetworks
+    {
+        get
+        {
+            var connected = ConnectedSsid;
+            if (connected is null) return [];
+            return ConfiguredNetworks
+                .Where(n => n.Enabled && !string.Equals(n.Ssid, connected, StringComparison.Ordinal))
+                .ToList();
+        }
+    }
+
     private static int ParseAddress(XElement element)
     {
         var value = element.Element("DCCadress")?.Attribute("value")?.Value
@@ -123,3 +154,4 @@ public sealed class WiFredDevice(IPAddress address)
 
 public sealed record LocoSlot(int Slot, int Address);
 public sealed record LocoAddressConflict(int Address, IReadOnlyList<WiFredDevice> Devices);
+public sealed record WiFredNetwork(string Ssid, bool Enabled);

@@ -4,7 +4,7 @@ A .NET 10 WiThrottle protocol server that enables [WiFred](https://github.com/ne
 to control model trains via any command station that has LocoNet support or a network API (e.g. Roco Z21).
 
 **Important: This implementation *only*** supports the part of the wiThrottle
-protocol acually used by the **wiFRED**.
+protocol actually used by the **wiFRED**.
 
 ## References
 
@@ -17,7 +17,7 @@ protocol acually used by the **wiFRED**.
 - WiThrottle protocol v2.0 (wiFred-compatible subset)
 - Up to 4 locos per WiFred, multiple concurrent wiFred connections
 - Loco acquisition reports actual state (speed, direction, functions) from the command station
-- mDNS service discovwry (`_withrottle._tcp`)
+- mDNS service discovery (`_withrottle._tcp`)
 - Heartbeat monitoring with automatic emergency stop
 - Per-loco speed debouncing and global rate limiting
 - Momentary (e.g. horn) and latching (e.g. lights) function buttons, as configured in the wiFRED
@@ -42,100 +42,21 @@ Pick **one** of the following:
 
 ## Getting Started
 
+For a step-by-step guide with connection diagrams, see the [Getting Started Guide](docs/getting-started.md).
+
+Downloads are available under [Releases](https://github.com/tellurianinteractive/Tellurian.Trains.WiThrottle/releases).
+
 ### Supported Platforms
 
-Published as self-contained single-file executables for:
+Published as self-contained single-file executables (no .NET installation needed):
 
-- **Windows x64** (`win-x64`)
-- **Linux ARM** (`linux-arm`) — e.g. Raspberry Pi (32-bit)
-- **Linux ARM64** (`linux-arm64`) — e.g. Raspberry Pi (64-bit)
+| Platform | Download | Minimum OS |
+|----------|----------|------------|
+| Windows x64 | `wifred-server-win-x64.zip` | Windows 10 |
+| Linux ARM | `wifred-server-linux-arm.zip` | Raspberry Pi OS 11+ (32-bit) |
+| Linux ARM64 | `wifred-server-linux-arm64.zip` | Raspberry Pi OS 11+ (64-bit) |
 
-### System Requirements
-
-#### Server (runs the wiFRED Server application)
-
-The app is built on .NET 10 and published as a self-contained executable, so no separate .NET installation is needed. However, the operating system must meet .NET 10's minimum requirements:
-
-| OS | Minimum Version |
-|----|-----------------|
-| Windows (x64) | Windows 10 or Windows Server 2012 R2 |
-| Linux ARM/ARM64 | Raspberry Pi OS 11 (Bullseye) or later, Ubuntu 22.04+, Debian 11+ |
-| macOS | macOS 15 "Sequoia" or later (no pre-built binary; build from source) |
-
-Windows 7 and Windows 8.1 are **not supported** by .NET 10.
-
-A detailed .NET 10 OS support list can be found [here](https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md).
-
-#### Web Dashboard (browser)
-
-The web dashboard uses Blazor Server with SignalR over WebSockets.
-Any device on the network can access it — it does not need to run on the same machine as the server.
-
-| Browser | Minimum Version |
-|---------|-----------------|
-| Google Chrome | Current version |
-| Microsoft Edge | Current version |
-| Mozilla Firefox | Current version |
-| Apple Safari | Current version |
-
-Internet Explorer is **not supported**. Microsoft dropped Blazor support for IE starting with ASP.NET Core 5.0.
-
-### Installing and Running
-
-You find releases under [Releases](https://github.com/tellurianinteractive/Tellurian.Trains.WiThrottle/releases) on the repository's root page.
-
-#### Linux
-
-Install and run for the first time
-
-1. Download **wifred-server-linux-arm.zip** for 32-bit or **wifred-server-linux-arm64.zip** for 64-bit
-2. unzip **wifred-server-*.zip** -d wifredserver
-3. cd wifredserver
-4. configure control station to use in **appsettings.json**
-5. chmod +x Tellurian.Trains.WiFreds
-6. ./Tellurian.Trains.WiFreds  **<- this starts the app, only thing needed when running later**
-
-You may also consider to use autostart of the wiFRED Server.
-This is operating system specific and not covered here.
-
-#### Windows
-
-Install and run for the first time
-
-1. Download **wifred-server-win-x64.zip**.
-2. unzip **wifred-server-win-x64.zip** -d wifredserver
-3. cd wifredserver
-4. configure control station to use in **appsettings.json**
-5. ./Tellurian.Trains.WiFreds  **<- this starts the app, only thing needed when running later**
-
-You may also consider to use autostart of the wiFRED Server.
-This is operating system specific and not covered here.
-
-## Web Dashboard
-
-The server includes a built-in web dashboard that shows all currently connected wiFRED devices.
-The page auto-refreshes every 5 seconds and displays:
-
-- Device name, IP address, and battery level as percentage (with low-battery warning)
-- All 4 loco address slots as individual columns, color-coded: green for addresses actively controlled by a wiFRED session, red for idle addresses
-- Last seen timestamp
-- Configure button with a safety warning before opening the wiFRED's configuration page (opening it while trains are running may interfere with heartbeats)
-- Loco address conflicts (when multiple wiFREDs control the same loco)
-
-Loco addresses can be edited inline: click an address value to open an edit field,
-change the value, and click Save. The server sends the update to the wiFRED
-and re-reads its configuration to confirm the change.
-
-It is possible to configure in `appsettings.json` that the web dashboard should autostart. If you are running headless (without screen) this setting should
-remain `false`.
-
-The web UI is available at `http://<server-address>:5000` by default.
-The web port can be configured via the `Urls` setting in `appsettings.json`
-or via the `--urls` command-line argument:
-
-```bash
-./Tellurian.Trains.WiFreds --urls http://*:8080
-```
+The web dashboard works in any current version of Chrome, Edge, Firefox, or Safari.
 
 ## Configuration
 
@@ -164,6 +85,7 @@ All settings are in `appsettings.json`:
 | `CommandStation:LocoNetUdp` | `SendAddress`                | `224.0.0.1`     | UDP multicast send address                                |
 | `CommandStation:LocoNetUdp` | `SendPort`                   | `1235`          | UDP multicast send port                                   |
 | `CommandStation:LocoNetUdp` | `ValidateChecksum`           | `true`          | Validate LocoNet checksums on received datagrams          |
+| `WiFredDiscovery`           | `RefreshIntervalMinutes`     | `5`             | Minutes between automatic config re-reads per wiFRED      |
 
 Settings can also be overridden via environment variables or command-line arguments
 using standard .NET configuration (e.g. `WiFred__Port=12345`).
@@ -263,14 +185,13 @@ copy it to the PiLocoBuffer, and run it alongside the LbServer.
 
 ## wiFRED WiFi Configuration
 
-The wiFRED firmware supports multiple configured WiFi networks, but only **one should be enabled at a time**.
-The firmware caches the WiThrottle server address after the first successful mDNS discovery,
-and this cache is not cleared when switching between networks. Having multiple networks enabled
-can cause the wiFRED to connect to WiFi successfully but fail to reach the WiThrottle server,
-because it tries to use a cached server address from a different network.
+The wiFRED firmware caches the WiThrottle server address after mDNS discovery and does not
+clear this cache when switching between WiFi networks. This can cause connection failures
+when moving a wiFRED between locations (e.g. club and home).
 
-**Recommendation:** On the wiFRED's configuration page, disable any WiFi networks
-you are not currently using. Enable only the network where your wiFRED Server is running.
+The server detects this situation automatically: when a wiFRED connects with multiple
+WiFi networks enabled, the server temporarily disables the extra networks, restarts
+the wiFRED to force a fresh server discovery, and then re-enables all networks.
 
 ## Known Limitations
 

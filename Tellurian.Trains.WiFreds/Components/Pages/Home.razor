@@ -10,6 +10,7 @@
 <PageTitle>@Messages.ConnectedWiFREDs</PageTitle>
 
 <h2>@Messages.ConnectedWiFREDs</h2>
+<p class="address-hint">@Messages.InactiveAddressHint</p>
 
 @if (_devices.Count == 0)
 {
@@ -154,6 +155,7 @@ else
 
     private void StartEdit(WiFredDevice device, LocoSlot slot)
     {
+        if (slot.Address > 0 && LocoTracker.IsActive(slot.Address)) return;
         _editingDevice = device;
         _editingSlot = slot.Slot;
         _editAddress = slot.Address;
