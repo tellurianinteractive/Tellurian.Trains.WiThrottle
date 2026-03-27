@@ -7,8 +7,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Makaretu.Dns.Multicast" Version="0.27.0" />
-		<PackageReference Include="Tellurian.Trains.Adapters.LocoNet" Version="1.7.0" />
-		<PackageReference Include="Tellurian.Trains.Adapters.Z21" Version="1.7.0" />
+		<PackageReference Include="Tellurian.Trains.Adapters.LocoNet" Version="1.7.1" />
+		<PackageReference Include="Tellurian.Trains.Adapters.Z21" Version="1.7.1" />
 	</ItemGroup>
 
 	<ItemGroup>

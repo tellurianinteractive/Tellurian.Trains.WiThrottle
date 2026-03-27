@@ -1,5 +1,11 @@
 # Release Notes
 
+## Version 1.3.8
+
+### Bug Fixes
+
+- Updated LocoNet/Z21 adapter packages to 1.7.1, fixing reversed F1-F4 function key bit order in LocoNet DIRF commands. This caused F1↔F4 and F2↔F3 to be swapped when controlling locomotives via USB-to-serial or other LocoNet connections.
+
 ## Version 1.3.7
 
 ### Web Dashboard
