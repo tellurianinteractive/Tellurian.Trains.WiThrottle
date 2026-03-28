@@ -1,5 +1,14 @@
 # Release Notes
 
+## Version 1.3.9
+
+### Bug Fixes
+
+- Updated LocoNet/Z21 adapter packages to 1.7.3, fixing:
+  - Reversed F1-F4 function key bit order in LocoNet DIRF commands, which caused F1↔F4 and F2↔F3 to be swapped.
+  - LocoNet slot cache going stale after sending function commands, which caused toggling one function to reset others (since LocoNet packs multiple functions into a single byte).
+  - LocoNet adapter now listens for speed, direction, and function changes from other throttles on the bus, keeping its slot cache in sync.
+
 ## Version 1.3.8
 
 ### Bug Fixes
