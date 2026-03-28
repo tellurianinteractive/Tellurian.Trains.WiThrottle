@@ -176,12 +176,12 @@ public sealed class WiFredTcpServer : BackgroundService
                 if (now - session.LastActivity > timeout)
                 {
                     if (_logger.IsEnabled(LogLevel.Warning))
-                        _logger.LogWarning("Heartbeat timeout for client {ClientId} ({Name}), emergency stopping all locos",
+                        _logger.LogWarning("Heartbeat timeout for client {ClientId} ({Name}), emergency stopping and releasing all locos",
                             clientId, session.Name);
 
                     try
                     {
-                        await handler.EmergencyStopAllAsync(stoppingToken);
+                        await handler.EmergencyStopAndReleaseAllAsync(stoppingToken);
                     }
                     catch (Exception ex)
                     {
@@ -189,8 +189,10 @@ public sealed class WiFredTcpServer : BackgroundService
                             _logger.LogError(ex, "Error during heartbeat timeout e-stop for {ClientId}", clientId);
                     }
 
-                    // Reset activity to avoid repeated e-stops
-                    session.TouchActivity();
+                    // Disable heartbeat monitoring to prevent repeated e-stops
+                    // that would interfere with wired throttles controlling the same addresses.
+                    // Monitoring resumes automatically if the wiFRED recovers and sends a heartbeat.
+                    session.HeartbeatEnabled = false;
                 }
             }
         }

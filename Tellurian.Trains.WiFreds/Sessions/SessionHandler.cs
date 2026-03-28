@@ -82,7 +82,17 @@ public sealed class SessionHandler
 
     private string? HandleHeartbeat()
     {
-        // Activity already touched above
+        // If heartbeat was disabled after a timeout, re-enable monitoring
+        // and re-register locos in the tracker (wiFRED recovered from WiFi loss).
+        if (!_session.HeartbeatEnabled)
+        {
+            _session.HeartbeatEnabled = true;
+            foreach (var loco in _session.Locos.Values)
+                _tracker.MarkAcquired(loco.Address.Number, _sessionId);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Heartbeat recovered for {Name}, re-acquired {Count} locos",
+                    _session.Name, _session.Locos.Count);
+        }
         return null;
     }
 
@@ -241,6 +251,8 @@ public sealed class SessionHandler
         {
             loco.Speed = 0;
             await _controller.EmergencyStopAsync(loco.Address, cancellationToken);
+            _logger.LogWarning("Emergency stopped loco {Address} in session {Name}",
+                loco.Address.Number, _session.Name);
             _controller.RemoveSpeedThrottler(loco.Address.Number);
         }
     }

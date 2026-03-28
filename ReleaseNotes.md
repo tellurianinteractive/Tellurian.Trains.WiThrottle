@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version 1.3.10
+
+### Bug Fixes
+
+- Fixed heartbeat timeout causing repeated emergency stops that prevented wired Freds from controlling the same loco address. When a wiFRED loses heartbeat due to WiFi congestion, the server now emergency stops once for safety and then releases the addresses, instead of re-stopping every 10 seconds for as long as the TCP connection remains open.
+- If the wiFRED recovers (WiFi comes back), heartbeat monitoring and address tracking resume automatically when the next heartbeat is received.
+
 ## Version 1.3.9
 
 ### Bug Fixes
