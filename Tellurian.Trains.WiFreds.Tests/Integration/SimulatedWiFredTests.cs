@@ -202,6 +202,163 @@ public class SimulatedWiFredTests
     }
 
     [TestMethod]
+    public async Task HeartbeatTimeout_KeepsLocosActiveInTracker()
+    {
+        var port = GetFreePort();
+        var recorder = new RecordingLocoController();
+        var throttlingSettings = Options.Create(new ThrottlingSettings
+        {
+            SpeedTimeThresholdMs = 0,
+            SpeedStepThreshold = 0,
+            GlobalMessageRatePerSecond = 1000
+        });
+        var controller = new ThrottledLocoController(
+            recorder,
+            throttlingSettings,
+            NullLogger<ThrottledLocoController>.Instance);
+
+        var tracker = new ActiveLocoTracker(NullLogger<ActiveLocoTracker>.Instance);
+
+        var serverSettings = Options.Create(new WiFredSettings
+        {
+            Port = port,
+            HeartbeatTimeoutSeconds = 2,
+            ServiceName = "Test Server"
+        });
+
+        var server = new WiFredTcpServer(
+            serverSettings,
+            controller,
+            tracker,
+            NullLoggerFactory.Instance,
+            NullLogger<WiFredTcpServer>.Instance);
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        var serverTask = server.StartAsync(cts.Token);
+        await Task.Delay(200);
+
+        try
+        {
+            using var client = new TcpClient();
+            await client.ConnectAsync(IPAddress.Loopback, port, cts.Token);
+
+            using var stream = client.GetStream();
+            using var reader = new StreamReader(stream, leaveOpen: true);
+            await using var writer = new StreamWriter(stream, leaveOpen: true) { AutoFlush = true };
+
+            // Read handshake
+            await reader.ReadLineAsync(cts.Token);
+            await reader.ReadLineAsync(cts.Token);
+
+            // Enable heartbeat and acquire loco
+            await writer.WriteLineAsync("NTrackerTest");
+            await writer.WriteLineAsync("*+");
+            await writer.WriteLineAsync("MT+L1234<;>L1234");
+
+            // Drain acquisition response
+            while (true)
+            {
+                var line = await reader.ReadLineAsync(cts.Token);
+                if (line is null || line.Contains("s128")) break;
+            }
+
+            Assert.IsTrue(tracker.IsActive(1234), "Loco should be active after acquisition");
+
+            // Wait for heartbeat timeout
+            await Task.Delay(4000);
+
+            // Loco should still be active in tracker (e-stopped but not released)
+            Assert.IsTrue(tracker.IsActive(1234),
+                "Loco must remain active in tracker after heartbeat timeout — " +
+                "only disconnect/quit should release");
+
+            Assert.IsTrue(recorder.EmergencyStopCalls.Any(), "Expected e-stop from heartbeat timeout");
+        }
+        finally
+        {
+            cts.Cancel();
+            try { await serverTask; } catch (OperationCanceledException) { }
+        }
+    }
+
+    [TestMethod]
+    public async Task Disconnect_ReleasesLocosFromTracker()
+    {
+        var port = GetFreePort();
+        var recorder = new RecordingLocoController();
+        var throttlingSettings = Options.Create(new ThrottlingSettings
+        {
+            SpeedTimeThresholdMs = 0,
+            SpeedStepThreshold = 0,
+            GlobalMessageRatePerSecond = 1000
+        });
+        var controller = new ThrottledLocoController(
+            recorder,
+            throttlingSettings,
+            NullLogger<ThrottledLocoController>.Instance);
+
+        var tracker = new ActiveLocoTracker(NullLogger<ActiveLocoTracker>.Instance);
+
+        var serverSettings = Options.Create(new WiFredSettings
+        {
+            Port = port,
+            HeartbeatTimeoutSeconds = 5,
+            ServiceName = "Test Server"
+        });
+
+        var server = new WiFredTcpServer(
+            serverSettings,
+            controller,
+            tracker,
+            NullLoggerFactory.Instance,
+            NullLogger<WiFredTcpServer>.Instance);
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var serverTask = server.StartAsync(cts.Token);
+        await Task.Delay(200);
+
+        try
+        {
+            using (var client = new TcpClient())
+            {
+                await client.ConnectAsync(IPAddress.Loopback, port, cts.Token);
+
+                using var stream = client.GetStream();
+                using var reader = new StreamReader(stream, leaveOpen: true);
+                await using var writer = new StreamWriter(stream, leaveOpen: true) { AutoFlush = true };
+
+                // Read handshake
+                await reader.ReadLineAsync(cts.Token);
+                await reader.ReadLineAsync(cts.Token);
+
+                await writer.WriteLineAsync("NDisconnectTest");
+                await writer.WriteLineAsync("*+");
+                await writer.WriteLineAsync("MT+L5678<;>L5678");
+
+                // Drain acquisition response
+                while (true)
+                {
+                    var line = await reader.ReadLineAsync(cts.Token);
+                    if (line is null || line.Contains("s128")) break;
+                }
+
+                Assert.IsTrue(tracker.IsActive(5678), "Loco should be active after acquisition");
+            }
+            // client disposed = TCP disconnect
+
+            await Task.Delay(500); // Let server process disconnect
+
+            Assert.IsFalse(tracker.IsActive(5678),
+                "Loco must be released from tracker after disconnect");
+        }
+        finally
+        {
+            cts.Cancel();
+            try { await serverTask; } catch (OperationCanceledException) { }
+        }
+    }
+
+    [TestMethod]
     public async Task MultipleLocos_WildcardSpeed_AffectsAll()
     {
         var (server, recorder, port) = CreateServer();

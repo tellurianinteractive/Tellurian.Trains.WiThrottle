@@ -13,7 +13,7 @@ namespace Tellurian.Trains.WiFreds.Tests.Sessions;
 [TestClass]
 public class SessionHandlerTests
 {
-    private static (SessionHandler Handler, RecordingLocoController Recorder) CreateHandler()
+    private static (SessionHandler Handler, RecordingLocoController Recorder, ActiveLocoTracker Tracker) CreateHandler()
     {
         var recorder = new RecordingLocoController();
         var settings = Options.Create(new ThrottlingSettings
@@ -29,7 +29,7 @@ public class SessionHandlerTests
         var session = new ThrottleSession();
         var tracker = new ActiveLocoTracker(NullLogger<ActiveLocoTracker>.Instance);
         var handler = new SessionHandler(session, controller, tracker, "test-session", NullLogger.Instance);
-        return (handler, recorder);
+        return (handler, recorder, tracker);
     }
 
     private static async Task AcquireLocoAsync(SessionHandler handler, string locoId)
@@ -40,7 +40,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task AcquireLoco_ReturnsMultiLineResponse()
     {
-        var (handler, _) = CreateHandler();
+        var (handler, _, _) = CreateHandler();
 
         var response = await handler.HandleAsync(new WiFredMessage.AcquireLoco("L1234"));
 
@@ -56,7 +56,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task AcquireLoco_InvalidAddress_ReturnsNull()
     {
-        var (handler, _) = CreateHandler();
+        var (handler, _, _) = CreateHandler();
 
         var response = await handler.HandleAsync(new WiFredMessage.AcquireLoco("INVALID"));
 
@@ -66,7 +66,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task SetSpeed_CallsDriveWithSpeedThrottling()
     {
-        var (handler, recorder) = CreateHandler();
+        var (handler, recorder, _) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
 
         await handler.HandleAsync(new WiFredMessage.SetSpeed("L1234", 50));
@@ -81,7 +81,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task SetDirection_CallsDriveAsync()
     {
-        var (handler, recorder) = CreateHandler();
+        var (handler, recorder, _) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
 
         await handler.HandleAsync(new WiFredMessage.SetDirection("L1234", false));
@@ -95,7 +95,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task EmergencyStop_SingleLoco_CallsEmergencyStop()
     {
-        var (handler, recorder) = CreateHandler();
+        var (handler, recorder, _) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
 
         await handler.HandleAsync(new WiFredMessage.EmergencyStop("L1234"));
@@ -107,7 +107,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task EmergencyStop_Wildcard_StopsAllLocos()
     {
-        var (handler, recorder) = CreateHandler();
+        var (handler, recorder, _) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
         await AcquireLocoAsync(handler, "S5");
 
@@ -119,7 +119,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task SetFunction_LatchingPress_TogglesOn()
     {
-        var (handler, recorder) = CreateHandler();
+        var (handler, recorder, _) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
 
         await handler.HandleAsync(new WiFredMessage.SetFunction("L1234", 0, true, false));
@@ -133,7 +133,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task SetFunction_LatchingRelease_IsIgnored()
     {
-        var (handler, recorder) = CreateHandler();
+        var (handler, recorder, _) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
 
         await handler.HandleAsync(new WiFredMessage.SetFunction("L1234", 0, false, false));
@@ -144,7 +144,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task SetFunction_LatchingPressAgain_TogglesOff()
     {
-        var (handler, recorder) = CreateHandler();
+        var (handler, recorder, _) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
 
         // First press: toggle off -> on
@@ -160,7 +160,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task SetFunction_Force_DirectlySetsState()
     {
-        var (handler, recorder) = CreateHandler();
+        var (handler, recorder, _) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
 
         await handler.HandleAsync(new WiFredMessage.SetFunction("L1234", 3, false, true));
@@ -173,7 +173,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task Quit_EmergencyStopsAllLocos()
     {
-        var (handler, recorder) = CreateHandler();
+        var (handler, recorder, _) = CreateHandler();
         await AcquireLocoAsync(handler, "L1234");
         await AcquireLocoAsync(handler, "S5");
 
@@ -185,7 +185,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task ThrottleName_SetsSessionName()
     {
-        var (handler, _) = CreateHandler();
+        var (handler, _, _) = CreateHandler();
 
         await handler.HandleAsync(new WiFredMessage.ThrottleName("MyWiFred"));
 
@@ -195,7 +195,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task HardwareId_SetsSessionHardwareId()
     {
-        var (handler, _) = CreateHandler();
+        var (handler, _, _) = CreateHandler();
 
         await handler.HandleAsync(new WiFredMessage.HardwareId("aabbccddee"));
 
@@ -205,7 +205,7 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task HeartbeatOptIn_EnablesHeartbeat()
     {
-        var (handler, _) = CreateHandler();
+        var (handler, _, _) = CreateHandler();
 
         await handler.HandleAsync(new WiFredMessage.HeartbeatOptIn());
 
@@ -215,12 +215,83 @@ public class SessionHandlerTests
     [TestMethod]
     public async Task HandleAsync_TouchesActivity()
     {
-        var (handler, _) = CreateHandler();
+        var (handler, _, _) = CreateHandler();
         var before = handler.Session.LastActivity;
         Thread.Sleep(10);
 
         await handler.HandleAsync(new WiFredMessage.Heartbeat());
 
         Assert.IsTrue(handler.Session.LastActivity > before);
+    }
+
+    [TestMethod]
+    public async Task AcquireLoco_MarksActiveInTracker()
+    {
+        var (handler, _, tracker) = CreateHandler();
+
+        await handler.HandleAsync(new WiFredMessage.AcquireLoco("L1234"));
+
+        Assert.IsTrue(tracker.IsActive(1234), "Acquired loco should be active in tracker");
+    }
+
+    [TestMethod]
+    public async Task Quit_ReleasesLocosFromTracker()
+    {
+        var (handler, _, tracker) = CreateHandler();
+        await AcquireLocoAsync(handler, "L1234");
+        await AcquireLocoAsync(handler, "S5");
+        Assert.IsTrue(tracker.IsActive(1234));
+        Assert.IsTrue(tracker.IsActive(5));
+
+        await handler.HandleAsync(new WiFredMessage.Quit());
+
+        Assert.IsFalse(tracker.IsActive(1234), "Loco should be released from tracker after quit");
+        Assert.IsFalse(tracker.IsActive(5), "Loco should be released from tracker after quit");
+    }
+
+    [TestMethod]
+    public async Task EmergencyStopAll_DoesNotReleaseFromTracker()
+    {
+        var (handler, _, tracker) = CreateHandler();
+        await AcquireLocoAsync(handler, "L1234");
+        await AcquireLocoAsync(handler, "S5");
+
+        await handler.EmergencyStopAllAsync();
+
+        Assert.IsTrue(tracker.IsActive(1234), "E-stop must not release locos from tracker");
+        Assert.IsTrue(tracker.IsActive(5), "E-stop must not release locos from tracker");
+    }
+
+    [TestMethod]
+    public async Task EmergencyStopAndReleaseAll_ReleasesFromTracker()
+    {
+        var (handler, _, tracker) = CreateHandler();
+        await AcquireLocoAsync(handler, "L1234");
+
+        await handler.EmergencyStopAndReleaseAllAsync();
+
+        Assert.IsFalse(tracker.IsActive(1234), "Release should remove locos from tracker");
+    }
+
+    [TestMethod]
+    public async Task HeartbeatRecovery_ReAcquiresLocosInTracker()
+    {
+        var (handler, _, tracker) = CreateHandler();
+        await handler.HandleAsync(new WiFredMessage.HeartbeatOptIn());
+        await AcquireLocoAsync(handler, "L1234");
+        Assert.IsTrue(tracker.IsActive(1234));
+
+        // Simulate heartbeat timeout: e-stop without release, disable heartbeat
+        await handler.EmergencyStopAllAsync();
+        handler.Session.HeartbeatEnabled = false;
+
+        // Locos should still be active since we only e-stopped, not released
+        Assert.IsTrue(tracker.IsActive(1234), "E-stop must not release locos from tracker");
+
+        // Simulate heartbeat recovery
+        await handler.HandleAsync(new WiFredMessage.Heartbeat());
+
+        Assert.IsTrue(handler.Session.HeartbeatEnabled, "Heartbeat should be re-enabled after recovery");
+        Assert.IsTrue(tracker.IsActive(1234), "Locos should remain active after recovery");
     }
 }

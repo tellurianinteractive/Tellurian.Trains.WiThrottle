@@ -176,12 +176,12 @@ public sealed class WiFredTcpServer : BackgroundService
                 if (now - session.LastActivity > timeout)
                 {
                     if (_logger.IsEnabled(LogLevel.Warning))
-                        _logger.LogWarning("Heartbeat timeout for client {ClientId} ({Name}), emergency stopping and releasing all locos",
+                        _logger.LogWarning("Heartbeat timeout for client {ClientId} ({Name}), emergency stopping all locos",
                             clientId, session.Name);
 
                     try
                     {
-                        await handler.EmergencyStopAndReleaseAllAsync(stoppingToken);
+                        await handler.EmergencyStopAllAsync(stoppingToken);
                     }
                     catch (Exception ex)
                     {

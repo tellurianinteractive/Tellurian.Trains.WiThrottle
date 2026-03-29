@@ -1,5 +1,19 @@
 # Release Notes
 
+## Version 1.3.11
+
+### Bug Fixes
+
+- Fixed heartbeat timeout incorrectly releasing locos from the active address tracker, which caused three regressions introduced in 1.3.10:
+  - Web dashboard no longer updated when changing active loco slot (addresses always showed as inactive).
+  - Disconnected wiFREDs remained visible in the web dashboard (session went into unmonitored zombie state).
+  - Locos could no longer be driven after a heartbeat timeout/recovery cycle.
+- Heartbeat timeout now emergency stops locos without releasing them from the tracker. Only quit or TCP disconnect releases addresses.
+
+### Tests
+
+- Added regression tests for tracker state through acquire, e-stop, quit, disconnect, and heartbeat recovery lifecycle.
+
 ## Version 1.3.10
 
 ### Bug Fixes
