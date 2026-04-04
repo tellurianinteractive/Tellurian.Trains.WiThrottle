@@ -30,12 +30,14 @@ jobs:
           project="Tellurian.Trains.WiFreds/Tellurian.Trains.WiFreds.csproj"
           common_args="--configuration Release --self-contained true -p:PublishSingleFile=true -p:DebugType=none -p:IsTransformWebConfigDisabled=true"
           dotnet publish "$project" $common_args -r win-x64 -o publish/win-x64
+          dotnet publish "$project" $common_args -r win-arm64 -o publish/win-arm64
+          dotnet publish "$project" $common_args -r linux-x64 -o publish/linux-x64
           dotnet publish "$project" $common_args -r linux-arm -o publish/linux-arm
           dotnet publish "$project" $common_args -r linux-arm64 -o publish/linux-arm64
 
       - name: Bundle documentation and create zips
         run: |
-          for rid in win-x64 linux-arm linux-arm64; do
+          for rid in win-x64 win-arm64 linux-x64 linux-arm linux-arm64; do
             rm -f "publish/${rid}/appsettings.Development.json" "publish/${rid}"/*.pdb "publish/${rid}/web.config"
             cp wiFRED.md wiFRED.sv.md "publish/${rid}/"
             cd "publish/${rid}" && zip -r "../wifred-server-${rid}.zip" . && cd ../..
@@ -47,6 +49,8 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" \
             publish/wifred-server-win-x64.zip \
+            publish/wifred-server-win-arm64.zip \
+            publish/wifred-server-linux-x64.zip \
             publish/wifred-server-linux-arm.zip \
             publish/wifred-server-linux-arm64.zip \
             --title "$GITHUB_REF_NAME" \

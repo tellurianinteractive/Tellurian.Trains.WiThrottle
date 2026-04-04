@@ -14,10 +14,10 @@ commands that your command station understands.
 
 ```
                           WiFi
-    ┌─────────┐        ┌──────────┐        ┌─────────────────┐        ┌───────┐
-    │ wiFRED  │ ~~~~~> │  WiFi    │ -----> │  wiFRED Server  │ -----> │ Command│
-    │ throttle│        │  Router  │        │  (this program) │        │ Station│
-    └─────────┘        └──────────┘        └─────────────────┘        └───────┘
+    ┌─────────┐        ┌──────────┐        ┌─────────────────┐        ┌─────────┐
+    │ wiFRED  │ ~~~~~> │  WiFi    │ -----> │  wiFRED Server  │ -----> │ Command │
+    │ throttle│        │  Router  │        │  (this program) │        │ Station │
+    └─────────┘        └──────────┘        └─────────────────┘        └─────────┘
                                                    │
                                             ┌──────────────┐
                                             │ Web Dashboard│
@@ -26,12 +26,12 @@ commands that your command station understands.
 ```
 
 ```
-                                                              ┌────────┐
-                                         cable or             │Command │  track
-┌────────┐  WiFi   ┌────────┐  WiFi   ┌────────┐  network    │Station │  wires   ┌───────┐
+                                                            ┌────────┐
+                                         cable or           │Command │  track
+┌────────┐  WiFi   ┌────────┐  WiFi   ┌────────┐  network   │Station │  wires   ┌───────┐
 │ wiFRED │ · · · > │  WiFi  │ · · · > │ wiFRED │ ─────────> │(Z21 or │ ═══════> │ TRAIN │
-│throttle│         │ Router │         │ Server │             │LocoNet)│          └───────┘
-└────────┘         └────┬───┘         └────────┘             └────────┘
+│throttle│         │ Router │         │ Server │            │LocoNet)│          └───────┘
+└────────┘         └────┬───┘         └────────┘            └────────┘
                         :
                         : WiFi
                         :
@@ -65,7 +65,7 @@ some newer command stations), so why choose this one?
   wiFRED. Useful when preparing for a session or swapping locos.
 
 - **Safety features** — If a wiFRED loses connection (e.g. out of WiFi
-  range or battery dies), the server automatically stops all its trains.
+  range or battery dies), the server automatically stops its trains.
 
 - **Seamless network switching** — If your wiFRED has multiple WiFi
   networks configured (e.g. one for the club and one for home), the

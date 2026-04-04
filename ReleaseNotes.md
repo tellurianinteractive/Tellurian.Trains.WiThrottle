@@ -1,5 +1,11 @@
 # Release Notes
 
+## Version 1.3.12
+
+### Enhancements
+
+- Added publish profiles and CI/CD pipeline support for win-arm64 and linux-x64 platforms.
+
 ## Version 1.3.11
 
 ### Bug Fixes
